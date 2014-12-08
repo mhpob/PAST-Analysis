@@ -6,7 +6,7 @@
 # to create .gif files.
 
 library(ggplot2); library(raster); library(animation)
-source('p:/obrien/biotelemetry/telemetryr/sb_detections.R')
+source('sb_detections.R')
 anim.data <- secor.sb
 # Round down date/time
 anim.data$date.floor <- floor_date(anim.data$date.local, unit = 'day')
