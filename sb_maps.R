@@ -13,10 +13,10 @@ det.sites <- unique(secor.sb[,6:7])
 
 ggplot() + geom_polygon(data = pot, fill = 'darkgrey', color = 'black',
                         aes(long,lat, group = group)) +
-  coord_map(xlim = c(-77.4, -74), ylim = c(37.8, 39.6)) + 
+  coord_map(xlim = c(-77.4, -74), ylim = c(37.8, 39.6))  +
   geom_point(data = stations,
              aes(Dec.Long, Dec.Lat, color = Group), size = 3.5) +
-    scale_color_manual(values = c('green', 'yellow', 'blue', 'purple')) +
+    scale_color_manual(values = c('green', 'darkorange', 'blue', 'purple')) +
   labs(x = 'Longitude', y = 'Latitude', title = 'Maryland Receivers') +
   theme_bw() + theme(legend.text = element_text(size = 12),
                      legend.title = element_text(size = 14))
@@ -39,12 +39,15 @@ ggplot() + geom_polygon(data = pot, fill = 'darkgrey', color = 'black',
   theme_bw() + theme(legend.text = element_text(size = 12),
                      legend.title = element_text(size = 14))
 
+
 ggplot() + geom_polygon(data = pot, fill = 'darkgrey', color = 'black',
                         aes(long,lat, group = group)) +
   coord_map(xlim = c(-77.35, -76.22), ylim = c(37.87, 39)) + 
-  geom_point(data = det.sites, aes(x = long, y = lat),
+  geom_point(data = unique(secor.sb[secor.sb$array %in%
+                      c('Piney Point', 'Rt 301', 'DDOE'),6:7]),
+             aes(x = long, y = lat),
              size = 6, color = 'blue') +
-  geom_point(data = stations,
+  geom_point(data = stations[stations$System == 'Potomac',],
              aes(Dec.Long, Dec.Lat), size = 3.5, color = 'green') +
   geom_point(aes(x = -76.327180, y = 38.052251),
              col = 'red', shape = 7, size = 7) +
