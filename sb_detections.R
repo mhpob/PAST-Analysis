@@ -24,27 +24,35 @@ detects <- vemsort('p:/obrien/biotelemetry/detections', false)
 # detects <- detects[,c(2,1,3:8)]
 # 
 #     
-# arr <- function(part){grepl(part, detects[,4], ignore.case = T)}
-#   
-# detects$array <- ifelse(detects[,4] == 'CBL Pier', 'CBL Pier',
-#             ifelse(arr('cedar'), 'Cedar Point',
-#             ifelse(arr('piney'), 'Piney Point',
-#             ifelse(arr('pot'), 'CBIBS',
-#             ifelse(arr('301'), 'Rt 301',
-#             ifelse(arr('kent'), 'Kent Island',
-#             ifelse(arr('chop'), 'Choptank',
-#             ifelse(arr('marsh'), 'Marshyhope',
-#             ifelse(arr('nan'), 'Nanticoke',
-#             ifelse(arr('poco'), 'Pocomoke',
-#             ifelse(arr('repo'), 'Reports',
-#             ifelse(arr('dmf') | arr('vine'), 'Mass',
-#             ifelse(detects$station %in%
-#                      c('CC LS', 'LC2', 'NCD', 'NN 1ER FWS',
-#                        'NN 22 NOAA SP', 'NN DANGER FWS', 'Y wat'), 'Navy',
-#                        'Other')))))))))))))
-  
+secor.sb <- filter(detects, trans.num >= 25434 & trans.num <= 25533) %>%
+  data.frame()
 
-secor.sb <- filter(detects, trans.num >= 25434 & trans.num <= 25533)
+arr <- function(part){grepl(part, secor.sb[, 4], ignore.case = T)}
+  
+secor.sb$array <- ifelse(arr('cbl'), 'CBL Pier',
+            ifelse(arr('cedar'), 'Cedar Point',
+            ifelse(arr('piney'), 'Piney Point',
+            ifelse(arr('pot'), 'CBIBS',
+            ifelse(arr('301'), 'Rt 301',
+            ifelse(arr('kent'), 'Kent Island',
+            ifelse(arr('chop'), 'Choptank',
+            ifelse(arr('marsh'), 'Marshyhope',
+            ifelse(arr('nan'), 'Nanticoke',
+            ifelse(arr('poco'), 'Pocomoke',
+            ifelse(arr('repo'), 'Reports',
+            ifelse(arr('dmf') | arr('vine'), 'Mass',
+            ifelse(secor.sb$station %in% c('Alexandria', 'Dogue Creek',
+                    'Hains Point', 'Mattawoman', 'National Harbor',
+                    'Piscataway', 'Pomonkey', 'Radar Tower',
+                    'Roosevelt Br.', 'S. Capitol Br.', 'S. Craney Isl.'),
+                         'DDOE',
+            ifelse(secor.sb$station %in% c('Benedicts Bridge', 'Broomes',
+                    'Jacks North', 'Jacks South', 'Magruders', 'Pepco',
+                    'SERC Active'),
+                         'SERC',
+            ifelse(secor.sb$station %in% c('CC LS', 'LC2', 'NCD', 'NN 1ER FWS',
+                    'NN 22 NOAA SP', 'NN DANGER FWS', 'Y wat'), 'Navy',
+                    'Other')))))))))))))))
 
 tag.data <- read.csv('p:/obrien/biotelemetry/striped bass/taggingdata.csv',
                      header = T, stringsAsFactors = F)
@@ -69,4 +77,4 @@ secor.sb <- secor.sb %>%
   tbl_df()
 
 
-rm(detects, false, tag.data, firsttagging.25465, secondtagging.25465)
+rm(detects, false, tag.data, firsttagging.25465, secondtagging.25465, arr)
