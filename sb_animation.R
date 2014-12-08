@@ -5,22 +5,25 @@
 # also needs you to install ImageMagick (http://www.imagemagick.org) in order
 # to create .gif files.
 
+# Look into saveSWF for big file.
+
 library(ggplot2); library(raster); library(animation)
 source('sb_detections.R')
-anim.data <- secor.sb
+
 # Round down date/time
-anim.data$date.floor <- floor_date(anim.data$date.local, unit = 'day')
+secor.sb <- secor.sb %>%
+  mutate(date.floor = floor_date(date.local, unit = 'day'))
 
-# Drop repeated detections within the same day (Unique trans.num, station, 
-# date.floor combinations)
-anim.data <- anim.data[row.names(unique(anim.data[,c(1,5,14)])),]
-
-# Total number of fish detected per reciever per day
-anim.data <- as.data.frame(table(anim.data[, c(5,14)]), stringsAsFactors = F)
-# Only those station/day combinations where fish were detected
-anim.data <- filter(anim.data, Freq > 0)
-# Merge back in station locations
-anim.data <- (merge(anim.data, unique(secor.sb[, 5:7]), all.x=T))
+anim.data <- secor.sb %>%
+  # Drop repeated detections within the same day
+  # (Unique trans.num, station, date.floor combinations)
+  group_by(trans.num, station, date.floor) %>%
+  distinct() %>%
+  # Total number of fish detected per reciever per day
+  group_by(station, date.floor) %>%
+  summarize(tot.detect = n()) %>%
+  # Merge back in station locations
+  left_join(distinct(secor.sb[, c(5:7,14)]))
 
 # Attach date/place where the fish were tagged (i.e., their first observation)
 anim.data <- rbind(anim.data, 
@@ -28,9 +31,9 @@ anim.data <- rbind(anim.data,
                     c('Piccowaxen', '2014-04-01', 27, 38.337413, -76.938424),
                     c('Piccowaxen', '2014-04-04', 13, 38.337413, -76.938424),
                     c('Piccowaxen', '2014-04-07', 5, 38.337413, -76.938424),
-                    c('Piccowaxen', '2014-04-11', 8, 38.337413, -76.938424))
-for(i in 3:5) {anim.data[,i] <- as.numeric(anim.data[, i])}
-anim.data[, 2] <- ymd(anim.data[, 2])
+                    c('Piccowaxen', '2014-04-11', 8, 38.337413, -76.938424),
+                    c('Pt Lookout', '2014-10-30', 29, 38.051951, -76.327386))
+for(i in 3:5) {anim.data[,i] <- as.numeric(data.frame(anim.data)[, i])}
 
 # Maryland-only coords: c(39.356, -77.371), c(37.897, -75.626)
 # Note: If you use MD-only map, you have to filter outside points off.
