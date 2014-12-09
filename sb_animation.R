@@ -34,12 +34,15 @@ anim.data <- rbind(anim.data,
                     c('Piccowaxen', '2014-04-11', 8, 38.337413, -76.938424),
                     c('Pt Lookout', '2014-10-30', 29, 38.051951, -76.327386))
 for(i in 3:5) {anim.data[,i] <- as.numeric(data.frame(anim.data)[, i])}
+anim.data[, 2] <- as.Date(data.frame(anim.data)[, 2])
+
+anim.data <- data.frame(anim.data)
 
 # Maryland-only coords: c(39.356, -77.371), c(37.897, -75.626)
 # Note: If you use MD-only map, you have to filter outside points off.
 # MAB: c(42, -77.5), c(36.5, -69)
 library(OpenStreetMap)
-map <- openmap(c(42.9, -77.5), c(36.5, -69), type = 'mapquest-aerial')
+map <- openmap(c(42.95, -77.5), c(36.5, -69), type = 'mapquest-aerial')
 map <- autoplot.OpenStreetMap(openproj(map))
 
 # Use code below if there is a shapefile you'd like to use. Note that capitalization matters in actual file name!!
@@ -48,8 +51,9 @@ map <- autoplot.OpenStreetMap(openproj(map))
 # map <- ggplot() + geom_path(data = mapdat, aes(long, lat, group = group)) +
 #   coord_map(xlim = c(-77.5, -69), ylim = c(36.5, 42))
 
-dates <- seq(ymd('2014-03-30'), ymd('2014-10-09'), by = 'day')
-max.freq <- max(anim.data$Freq)
+dates <- seq(as.Date('2014-03-30'),
+             as.Date('2014-11-16'), by = 'day')
+max.freq <- max(anim.data$tot.detect)
 
 # Map with no inset
 saveHTML({
@@ -84,12 +88,13 @@ saveHTML({
 map2 <- openmap(c(39.356, -77.371), c(37.897, -75.626), type = 'mapquest-aerial')
 map2 <- autoplot.OpenStreetMap(openproj(map2))
  
-saveHTML({
+saveVideo({
   for (i in 1:length(dates)){
   plot <- map + geom_point(data = filter(anim.data, date.floor == dates[i]),
-                      aes(x = long, y = lat, size = Freq), color = 'red') +
-                   scale_size_area(limits = c(1,27), 
-                                   breaks = c(1,2,3,seq(4,16,2),27),
+                      aes(x = long, y = lat, size = tot.detect),
+                      color = 'red') +
+                   scale_size_area(limits = c(1, 29), 
+                                   breaks = c(1, 2, 3, seq(4, 20, 2), 27, 29),
                                    max_size = 20)+
                   annotate("text", x = -76, y = 41.5, size = 10,
                            label = dates[i], color = 'white') +
@@ -102,12 +107,12 @@ saveHTML({
                         line = element_blank())
   
   plot2 <- ggplotGrob(map2 + geom_point(data =
-                                          filter(anim.data, date.floor == dates[i],
-                                                 lat >= 37.897, lat <= 39.356,
-                                                 long <= -75.626, long >= -77.371),
-                   aes(x = long, y = lat, size = Freq), color = 'red') +
-                   scale_size_area(limits = c(1,27), 
-                                   breaks = c(1,2,3,seq(4,16,2),27),
+                               filter(anim.data, date.floor == dates[i],
+                                        lat >= 37.897, lat <= 39.356,
+                                        long <= -75.626, long >= -77.371),
+                   aes(x = long, y = lat, size = tot.detect), color = 'red') +
+                   scale_size_area(limits = c(1, 29), 
+                                   breaks = c(1, 2, 3, seq(4, 20, 2), 27, 29),
                                    max_size = 20)+
                   theme(legend.position = 'none',
                         plot.background = element_blank(),
@@ -126,4 +131,6 @@ saveHTML({
     print(plot)
     ani.pause()
   }
-}, interval = 0.5, outdir = 'p:/obrien/biotelemetry')
+  }, interval = 0.5, video.name = 'sbani.mp4',
+  ffmpeg = 'C:/Program Files/ImageMagick-6.8.9-Q16/ffmpeg.exe',
+  outdir = 'c:/users/secor lab/desktop')
