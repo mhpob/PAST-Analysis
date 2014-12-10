@@ -76,5 +76,4 @@ secor.sb <- secor.sb %>%
   rbind(firsttagging.25465, secondtagging.25465) %>%
   tbl_df()
 
-
-rm(detects, false, tag.data, firsttagging.25465, secondtagging.25465, arr)
+save(secor.sb, file = 'secor.sb.rda')

@@ -13,3 +13,6 @@ Thumbs.db
 # RStudio files
 .Rproj.user/
 .Rproj.user
+
+# Striped bass data
+secor.sb.rda

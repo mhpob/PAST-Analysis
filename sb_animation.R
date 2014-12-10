@@ -8,7 +8,7 @@
 # Look into saveSWF for big file.
 
 library(ggplot2); library(raster); library(animation)
-source('sb_detections.R')
+load('secor.sb.rda')
 
 # Round down date/time
 secor.sb <- secor.sb %>%

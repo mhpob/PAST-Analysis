@@ -8,7 +8,7 @@ stations <- read.csv('p:/obrien/biotelemetry/csi/md csi receivers.csv',
                      header = T)
 stations <- stations[stations$Status %in% c('Deployed', 'Proposed'),]
 
-source('sb_detections.R')
+load('secor.sb.rda')
 det.sites <- unique(secor.sb[,6:7])
 
 ggplot() + geom_polygon(data = pot, fill = 'darkgrey', color = 'black',
