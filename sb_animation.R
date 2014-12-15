@@ -5,8 +5,6 @@
 # also needs you to install ImageMagick (http://www.imagemagick.org) in order
 # to create .gif files.
 
-# Look into saveSWF for big file.
-
 library(ggplot2); library(raster); library(animation)
 load('secor.sb.rda')
 
@@ -23,7 +21,7 @@ anim.data <- secor.sb %>%
   group_by(station, date.floor) %>%
   summarize(tot.detect = n()) %>%
   # Merge back in station locations
-  left_join(distinct(secor.sb[, c(5:7,14)]))
+  left_join(distinct(secor.sb[, c(5:7, 14)]))
 
 # Attach date/place where the fish were tagged (i.e., their first observation)
 anim.data <- rbind(anim.data, 
@@ -85,7 +83,8 @@ saveHTML({
 
 
 ## Create an inset map of MD Chesapeake Bay
-map2 <- openmap(c(39.356, -77.371), c(37.897, -75.626), type = 'mapquest-aerial')
+map2 <- openmap(c(39.356, -77.371), c(37.897, -75.626),
+                type = 'mapquest-aerial')
 map2 <- autoplot.OpenStreetMap(openproj(map2))
  
 saveVideo({

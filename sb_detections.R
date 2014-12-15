@@ -1,33 +1,21 @@
 library(TelemetryR); library(lubridate); library(dplyr)
 
 # False detections as determined by VEMCO
-false <- c('37119', '64288')
-detects <- vemsort('p:/obrien/biotelemetry/detections', false)
+false.pos <- c("A69-1303-15268", "A69-1303-21996", "A69-1303-55828",
+               "A69-1601-13358", "A69-1601-14295", "A69-1601-18147",
+               "A69-1601-20794", "A69-1601-21435", "A69-1601-25631",
+               "A69-1601-27179", "A69-1601-31594", "A69-1601-37119",
+               "A69-1601-41805", "A69-1601-43368", "A69-1601-43862",
+               "A69-1601-60533", "A69-1601-64288", "A69-1601-9185",
+               "A69-1602-22686", "A69-1602-23019", "A69-1602-46762",
+               "A69-1602-54302", "A69-1602-64173", "A69-1602-64407",
+               "A69-9001-26563", "A69-9001-65126")
+detects <- vemsort('p:/obrien/biotelemetry/detections', false.pos)
 
-# Some data from MD DNR came in with location data missing
-# dnr <- data.frame(receiver = c('VR2W-106474', 'VR2W-102036', 'VR2W-106473',
-#                                'VR2W-106478'),
-#                 station1 = c('Kent Island A', 'Kent Island B', 'Kent Island C',
-#                              'Kent Island D'),
-#                   lat1 = c(38.9953333, 38.9913167, 38.9841500,
-#                            38.9799167),
-#                   long1 = c(-76.3995333, -76.3902333, -76.3727833,
-#                             -76.3539667),
-#                   stringsAsFactors = F)
-#   
-# detects <- merge(detects, dnr, all.x = T)
-# detects$station <- ifelse(is.na(detects$station), detects$station1,
-#                           detects$station)
-# detects$lat <- ifelse(is.na(detects$lat), detects$lat1, detects$lat)
-# detects$long <- ifelse(is.na(detects$long), detects$long1, detects$long)
-# detects <- detects[,-c(9:11)]
-# detects <- detects[,c(2,1,3:8)]
-# 
-#     
 secor.sb <- filter(detects, trans.num >= 25434 & trans.num <= 25533) %>%
   data.frame()
 
-arr <- function(part){grepl(part, secor.sb[, 4], ignore.case = T)}
+arr <- function(part){grepl(part, secor.sb[, 'station'], ignore.case = T)}
   
 secor.sb$array <- ifelse(arr('cbl'), 'CBL Pier',
             ifelse(arr('cedar'), 'Cedar Point',
@@ -55,7 +43,7 @@ secor.sb$array <- ifelse(arr('cbl'), 'CBL Pier',
                     'Other')))))))))))))))
 
 tag.data <- read.csv('p:/obrien/biotelemetry/striped bass/taggingdata.csv',
-                     header = T, stringsAsFactors = F)
+                     stringsAsFactors = F)
 tag.data$Date <- mdy(tag.data$Date, tz = 'America/New_York')
 tag.data <- tag.data[, c(1, 2, 5, 7, 8)]
 names(tag.data) <- c('tag.date', 'trans.num', 'length', 'weight', 'sex')
