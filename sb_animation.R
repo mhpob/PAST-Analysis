@@ -5,12 +5,12 @@
 # also needs you to install ImageMagick (http://www.imagemagick.org) in order
 # to create .gif files.
 
-library(ggplot2); library(raster); library(animation)
+library(ggplot2); library(raster); library(animation); library(dplyr)
 load('secor.sb.rda')
 
 # Round down date/time
 secor.sb <- secor.sb %>%
-  mutate(date.floor = floor_date(date.local, unit = 'day'))
+  mutate(date.floor = lubridate::floor_date(date.local, unit = 'day'))
 
 anim.data <- secor.sb %>%
   # Drop repeated detections within the same day
@@ -25,7 +25,7 @@ anim.data <- secor.sb %>%
 
 # Attach date/place where the fish were tagged (i.e., their first observation)
 anim.data <- rbind(anim.data, 
-                    c('Piccowaxen', '2014-03-30', 16, 38.337413, -76.938424),
+                    c('Piccowaxen', '2014-03-30', 18, 38.337413, -76.938424),
                     c('Piccowaxen', '2014-04-01', 27, 38.337413, -76.938424),
                     c('Piccowaxen', '2014-04-04', 13, 38.337413, -76.938424),
                     c('Piccowaxen', '2014-04-07', 5, 38.337413, -76.938424),
@@ -50,35 +50,35 @@ map <- autoplot.OpenStreetMap(openproj(map))
 #   coord_map(xlim = c(-77.5, -69), ylim = c(36.5, 42))
 
 dates <- seq(as.Date('2014-03-30'),
-             as.Date('2014-11-16'), by = 'day')
+             as.Date('2014-12-11'), by = 'day')
 max.freq <- max(anim.data$tot.detect)
 
-# Map with no inset
-saveHTML({
-  for (i in 1:length(dates)){
-  plot <- map + geom_point(data = filter(anim.data, date.floor == dates[i]),
-                      aes(x = long, y = lat, size = Freq), color = 'red') +
-                   scale_size_area(limits = c(1,27), 
-                                   breaks = c(1,2,3,seq(4,16,2),27),
-                                   max_size = 20)+
-                  annotate("text", x = -76, y = 42, size = 10,
-                           label = dates[i], color = 'white') +
-                  ggtitle('Striped Bass Detections') +
-                  theme(legend.position = 'none',
-                        plot.background = element_blank(),
-                        axis.text = element_blank(),
-                        axis.title = element_blank(),
-                        rect = element_blank(),
-                        line = element_blank())
-  print(plot)
-  ani.pause()
-  }
-  for(k in 1:3){
-    print(plot)
-    ani.pause()
-  }
-  }, interval = 0.5, verbose = F, nmax = length(dates), navigator = F,
-  outdir = 'c:/users/secor lab/desktop/animation')
+# # Map with no inset
+# saveHTML({
+#   for (i in 1:length(dates)){
+#   plot <- map + geom_point(data = filter(anim.data, date.floor == dates[i]),
+#                       aes(x = long, y = lat, size = Freq), color = 'red') +
+#                    scale_size_area(limits = c(1,27), 
+#                                    breaks = c(1,2,3,seq(4,16,2),27),
+#                                    max_size = 20)+
+#                   annotate("text", x = -76, y = 42, size = 10,
+#                            label = dates[i], color = 'white') +
+#                   ggtitle('Striped Bass Detections') +
+#                   theme(legend.position = 'none',
+#                         plot.background = element_blank(),
+#                         axis.text = element_blank(),
+#                         axis.title = element_blank(),
+#                         rect = element_blank(),
+#                         line = element_blank())
+#   print(plot)
+#   ani.pause()
+#   }
+#   for(k in 1:3){
+#     print(plot)
+#     ani.pause()
+#   }
+#   }, interval = 0.5, verbose = F, nmax = length(dates), navigator = F,
+#   outdir = 'c:/users/secor lab/desktop/animation')
 
 
 
