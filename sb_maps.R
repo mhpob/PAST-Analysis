@@ -4,7 +4,7 @@ pot <- midstates[midstates$STATE_ABBR %in% c('MD', 'VA', 'DC', 'DE'),]
 
 pot <- fortify(pot)
 
-stations <- read.csv('p:/obrien/biotelemetry/csi/md csi receivers.csv',
+stations <- read.csv('p:/obrien/biotelemetry/receivers/md csi receivers.csv',
                      stringsAsFactors = F)
 stations <- stations[stations$Status %in% c('Deployed', 'Proposed'),]
 

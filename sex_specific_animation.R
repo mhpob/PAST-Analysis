@@ -5,7 +5,7 @@ secor.sb <- secor.sb %>%
   mutate(date.floor = lubridate::floor_date(date.local, unit = 'day'))
 
 anim.data <- secor.sb %>%
-  filter(sex %in% c('M', 'F')) %>%
+  filter(sex %in% c('M', 'F')) %>%  #use this to drop UNID sexes
   group_by(trans.num, station, date.floor) %>%
   distinct() %>%
   group_by(station, date.floor, sex) %>%
@@ -38,7 +38,7 @@ map <- openmap(c(42.95, -77.5), c(36.5, -69), type = 'mapquest-aerial')
 map <- autoplot.OpenStreetMap(openproj(map))
 
 dates <- seq(as.Date('2014-03-30'),
-             as.Date('2014-12-11'), by = 'day')
+             as.Date('2015-01-15'), by = 'day')
 
 map2 <- openmap(c(39.356, -77.371), c(37.897, -75.626),
                 type = 'mapquest-aerial')
@@ -48,7 +48,7 @@ saveVideo({
   for (i in 1:length(dates)){
   plot <- map + geom_point(data = filter(anim.data, date.floor == dates[i]),
                       aes(x = long, y = lat, size = tot.detect, color = sex),
-                      position = 'jitter') +
+                      position = position_jitter(w = 0.05, h = 0.05)) +
                 scale_size_area(limits = c(1, 19),
                                 breaks = c(1, 2, 3, seq(4, 12, 2), 18, 19),
                                 max_size = 20, guide = F) +
@@ -71,11 +71,12 @@ saveVideo({
                                         lat >= 37.899, lat <= 39.354,
                                         long <= -75.626, long >= -77.371),
                    aes(x = long, y = lat, size = tot.detect, color = sex),
-                   position = 'jitter') +
+                   position = position_jitter(w = 0.05, h = 0.05)) +
                    scale_size_area(limits = c(1, 19),
                                 breaks = c(1, 2, 3, seq(4, 12, 2), 18, 19),
                                 max_size = 20) +
-                   scale_color_manual(values = c('pink', 'lightblue')) +
+                   scale_color_manual(values = c('pink', 'lightblue'),
+                                      limits = c('F', 'M')) +
                   theme(legend.position = 'none',
                         plot.background = element_blank(),
                         axis.text = element_blank(),
@@ -89,11 +90,7 @@ saveVideo({
   print(plot)
   ani.pause()
   }
-  for(k in 1:3){
-    print(plot)
-    ani.pause()
-  }
-  }, interval = 0.5, video.name = 'sbani.mp4',
-  ffmpeg = 'C:/Program Files/ImageMagick-6.8.9-Q16/ffmpeg.exe',
+  }, interval = 0.5, video.name = 'sb_sexspec_ani.mp4',
+  ffmpeg = 'C:/Program Files/ImageMagick-6.9.0-Q8/ffmpeg.exe',
   ani.height = 720, ani.width = 1280,
   other.opts = "-b 300k")
