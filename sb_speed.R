@@ -109,11 +109,15 @@ for(k in 1:length(old.splt)) {
 old <- do.call(rbind.data.frame, old.splt)
 row.names(old) <- NULL
 old[is.na(old)] <- 0
+old[is.infinite(old$mean.sp),16] <- 0
+
+#need to filter speeds that are too great.
 
 ## Plotting --------------------------------------------------------------------
+library(ggplot2)
 
-
-
+ggplot() + geom_line(data = old, aes(x = date.local, y = mean.sp,
+                                     color = factor(trans.num)))
 
 
 
