@@ -75,7 +75,7 @@ old <- secor.sb %>%
   arrange(date.local) %>%
   as.data.frame()
 
-old.splt <- split(old, old$transmitter)
+old.split <- split(old, old$transmitter)
 
 dist <- read.csv('distances.csv', stringsAsFactors = F)
 row.names(dist) <- dist[, 1]
@@ -83,42 +83,68 @@ names(dist)[2:114] <- dist[, 1]
 dist <- dist[,2:114]
 
 
-for(k in 1:length(old.splt)) {
-  for(i in 1:dim(old.splt[[k]])[1]) {
-    if(i == dim(old.splt[[k]])[1] | i == 1){
-      old.splt[[k]]$dist[i] <- 0
+for(k in 1:length(old.split)) {
+  for(i in 1:dim(old.split[[k]])[1]) {
+    if(i == dim(old.split[[k]])[1] | i == 1){
+      old.split[[k]]$dist[i] <- 0
     }
     else{
-      a <- as.character(old.splt[[k]][i, 'station'])
-      b <- as.character(old.splt[[k]][i + 1, 'station'])
-      old.splt[[k]]$dist[i + 1] <- dist[a, b]
+      a <- as.character(old.split[[k]][i, 'station'])
+      b <- as.character(old.split[[k]][i + 1, 'station'])
+      old.split[[k]]$dist[i + 1] <- dist[a, b]
     }
   }
-  
 }
 
-for(k in 1:length(old.splt)) {
-  for(i in 1:dim(old.splt[[k]])[1]) {
-    old.splt[[k]]$time[i] <- ifelse(i == 1, 0,
-                  as.numeric(difftime(old.splt[[k]][i, 2],
-                                      old.splt[[k]][i-1, 2], units= 'secs')))
+for(k in 1:length(old.split)) {
+  for(i in 1:dim(old.split[[k]])[1]) {
+    old.split[[k]]$time[i] <- ifelse(i == 1, 0,
+                  as.numeric(difftime(old.split[[k]][i, 'date.utc'],
+                                      old.split[[k]][i-1, 'date.utc'],
+                                      units= 'secs')))
   }
-  old.splt[[k]]$mean.sp <- (old.splt[[k]]$dist*1000)/old.splt[[k]]$time
+  old.split[[k]]$mean.sp <- (old.split[[k]]$dist*1000)/old.split[[k]]$time
 }
 
-old <- do.call(rbind.data.frame, old.splt)
+old <- do.call(rbind.data.frame, old.split)
 row.names(old) <- NULL
+old <- old %>% mutate(length.bin = ifelse(length < 550, '<55',
+                      ifelse(length >= 550 & length < 650, '55-65',
+                      ifelse(length >= 650 & length < 800, '65-80', '>80'))),
+                      length.bin = factor(length.bin,
+                                   levels = c('<55', '55-65', '65-80', '>80'),
+                                   ordered = T),
+                      max.sp = length/1000 * 5, #(5 body lengths/s in m/s)
+                      mean.sp.bl = (dist/time * 1000000)/length)
 old[is.na(old)] <- 0
-old[is.infinite(old$mean.sp),16] <- 0
+old[is.infinite(old$mean.sp), 'mean.sp'] <- 0
+old[old$mean.sp > old$max.sp, 'mean.sp'] <- 0
 
+# rm(dist, secor.sb, a, b, i, k, old.split)
 #need to filter speeds that are too great.
 
 ## Plotting --------------------------------------------------------------------
 library(ggplot2)
 
-ggplot() + geom_line(data = old, aes(x = date.local, y = mean.sp,
-                                     color = factor(trans.num)))
+ggplot() + geom_histogram(data = filter(old, mean.sp > 0, sex %in% c('M', 'F')),
+                          aes(x= mean.sp, fill = sex),
+                          binwidth = 0.5)
 
+ggplot() + geom_histogram(data = filter(old, mean.sp > 0),
+                          aes(x= mean.sp, fill = length.bin),
+                          binwidth = 0.5)
+
+ggplot() + geom_bar(data = filter(old, mean.sp > 0),
+                          aes(x= mean.sp.bl, y = ..density.., fill = length.bin),
+                          binwidth = 0.5, position = 'dodge') +
+  labs(x = expression('Mean Speed (Body length sec' ^-1 *')'),
+       y = 'Density')
+
+ggplot() + geom_bar(data = filter(old, mean.sp > 0, sex %in% c('M', 'F')),
+                          aes(x= mean.sp.bl, y = ..density.., fill = sex),
+                          binwidth = 0.5, position = 'dodge') +
+  labs(x = expression('Mean Speed (Body length sec' ^-1 *')'),
+       y = 'Density')
 
 
 
