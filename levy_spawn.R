@@ -117,3 +117,32 @@ binned <- spawn %>%
     bins = cut(mean.sp.bl, breaks = c(2^seq(0, 3.25, 0.25)))) %>% 
   group_by(phase, bins) %>%
   tally()
+
+j <- levels(binned$bins)
+j <- strsplit(j, ',')
+j <- sapply(j, strsplit, ']')
+j <- data.frame(j)
+j <- slice(j, 2)
+j <- t(j)
+j <- as.numeric(j)
+binned$bins <- j
+
+for(i in 1:length(binned$bins)){
+  binned[i, 'width'] <- ifelse(binned[i, 'bins'] == 1.19, 0.19,
+                           binned[i, 'bins'] - binned[i - 1, 'bins'])
+}
+
+binned <- binned %>% 
+  group_by(phase) %>% 
+  mutate(width = as.numeric(width),
+    log.nfreq = log10(n / width / 13),
+    log.bins = log10(bins))
+
+library(ggplot2)
+ggplot(data = binned, aes(x = log.bins, y = log.nfreq, color = phase)) + geom_point() +stat_smooth(method = 'lm')
+
+summary(lm(log.nfreq~log.bins, data = subset(binned, phase == 'spawning')))
+summary(lm(log.nfreq~log.bins, data = subset(binned, phase == 'running')))
+
+## t-test between the two to see if there are differences in slope???
+## µ near 2 is Lévy, µ near 1 is random, µ near 3 is Gaussian
