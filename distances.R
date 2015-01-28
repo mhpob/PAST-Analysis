@@ -22,17 +22,15 @@ geo <- geoCorrection(trans, type = 'c')
 
 load('secor.sb.rda')
 
-old <- secor.sb %>%
-  filter(tag.date < '2014-10-01', date.local >= '2014-04-15',
-         date.local <= '2014-09-15') %>%
+secor.sb <- secor.sb %>%
   group_by(station) %>%
   summarize(lat = mean(lat), lon = mean(long)) %>%
   as.data.frame()
 
-row.names(old) <- old[, 1]
-old <- old[, c(3, 2)]
+row.names(secor.sb) <- secor.sb[, 1]
+secor.sb <- secor.sb[, c(3, 2)]
 
-rm(trans, secor.sb)
+rm(trans)
 
 lc.dist <- function (trans, loc, res = c("dist", "path")){
   # Code directly stolen then slightly edited from marmap package
@@ -58,8 +56,8 @@ lc.dist <- function (trans, loc, res = c("dist", "path")){
     }
 }
 
-distances <- lc.dist(geo, old, res = 'dist')
-paths <- lc.dist(geo, old, res = 'path')
+distances <- lc.dist(geo, secor.sb, res = 'dist')
+# paths <- lc.dist(geo, secor.sb, res = 'path')
 
 distances <- as.matrix(distances)
 write.csv(distances,'distances.csv')
