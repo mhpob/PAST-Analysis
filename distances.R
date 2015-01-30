@@ -23,6 +23,7 @@ geo <- geoCorrection(trans, type = 'c')
 load('secor.sb.rda')
 
 secor.sb <- secor.sb %>%
+  filter(!grepl('Report', station)) %>% 
   group_by(station) %>%
   summarize(lat = mean(lat), lon = mean(long)) %>%
   as.data.frame()
@@ -57,6 +58,7 @@ lc.dist <- function (trans, loc, res = c("dist", "path")){
 }
 
 distances <- lc.dist(geo, secor.sb, res = 'dist')
+beepr::beep(8)
 # paths <- lc.dist(geo, secor.sb, res = 'path')
 
 distances <- as.matrix(distances)
