@@ -12,7 +12,10 @@ false.pos <- c("A69-1303-15268", "A69-1303-21996", "A69-1303-55828",
                "A69-9001-26563", "A69-9001-65126")
 detects <- vemsort('p:/obrien/biotelemetry/detections', false.pos)
 
-secor.sb <- filter(detects, trans.num >= 25434 & trans.num <= 25533) %>%
+j <- detects %>% 
+  filter(trans.num >= 25434 & trans.num <= 25533) %>%
+  select(-one_of('trans.name', 'trans.serial', 'sensor.value',
+                 'sensor.unit')) %>% 
   data.frame()
 
 arr <- function(part){grepl(part, secor.sb[, 'station'], ignore.case = T)}
