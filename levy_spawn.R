@@ -61,8 +61,8 @@ secor.sb <- secor.sb %>%
 
 dist <- read.csv('distances.csv', stringsAsFactors = F)
 row.names(dist) <- dist[, 1]
-names(dist)[2:123] <- dist[, 1]
-dist <- dist[,2:123]
+names(dist)[2:120] <- dist[, 1]
+dist <- dist[,2:120]
 
 d.adj <- function(data){
   spl <- split(data, data[, 'transmitter'])
