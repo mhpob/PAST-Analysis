@@ -12,7 +12,7 @@ false.pos <- c("A69-1303-15268", "A69-1303-21996", "A69-1303-55828",
                "A69-9001-26563", "A69-9001-65126")
 detects <- vemsort('p:/obrien/biotelemetry/detections', false.pos)
 
-j <- detects %>% 
+secor.sb <- detects %>% 
   filter(trans.num >= 25434 & trans.num <= 25533) %>%
   select(-one_of('trans.name', 'trans.serial', 'sensor.value',
                  'sensor.unit')) %>% 
