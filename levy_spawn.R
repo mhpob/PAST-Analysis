@@ -120,7 +120,7 @@ binned <- spawn %>%
 
 j <- levels(binned$bins)
 j <- strsplit(j, ',')
-j <- sapply(j, strsplit, ']')
+
 j <- data.frame(j)
 j <- slice(j, 2)
 j <- t(j)
