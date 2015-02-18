@@ -31,7 +31,12 @@ secor.sb$array <- ifelse(arr('cbl'), 'CBL Pier',
             ifelse(arr('nan'), 'Nanticoke',
             ifelse(arr('poco'), 'Pocomoke',
             ifelse(arr('repo'), 'Reports',
-            ifelse(arr('dmf') | arr('vine'), 'Mass',
+            ifelse(arr('vims|york'), 'York',
+            ifelse(arr('sandy|barnegat|shark'), 'New Jersey',
+            ifelse(arr('fire|jones|montauk|rockaway|shinnecock|swg'), 'Long Island',
+            ifelse(arr('dmf|vine|cz|ph|nera|plum|joppa') |
+                     secor.sb$station %in% c('CA3', 'ER1', 'ER2', 'ER3', 'ER5',
+                                             'ER6'), 'Mass',
             ifelse(secor.sb$station %in% c('Alexandria', 'Dogue Creek',
                     'Hains Point', 'Mattawoman', 'National Harbor',
                     'Piscataway', 'Pomonkey', 'Radar Tower',
@@ -43,7 +48,7 @@ secor.sb$array <- ifelse(arr('cbl'), 'CBL Pier',
                          'SERC',
             ifelse(secor.sb$station %in% c('CC LS', 'LC2', 'NCD', 'NN 1ER FWS',
                     'NN 22 NOAA SP', 'NN DANGER FWS', 'Y wat'), 'Navy',
-                    'Other')))))))))))))))
+                    'Other'))))))))))))))))))
 
 tag.data <- read.csv('p:/obrien/biotelemetry/striped bass/taggingdata.csv',
                      stringsAsFactors = F)
