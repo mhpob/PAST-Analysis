@@ -3,11 +3,11 @@ midstates <- shapefile(
   'p:/obrien/gis/shapefiles/midatlantic/matl_states_land.shp')
 
 # Create nonsense raster file to clip shapefile
-ras.back <- raster(extent(-77.344, -69.8, 36.862, 42.872),
+ras.back <- raster(extent(-77.344, -69.8, 36.75, 42.872),
                    resolution = 1/360, #5 arc-second grids = 720, 10 = 360
                    vals = 1,
                    crs = proj4string(midstates))
-mem.crop <- cbind(c(-75.8, -69.8, -69.8, -75.8), c(36.85, 36.85, 41.2, 36.85))
+mem.crop <- cbind(c(-75.8, -69.8, -69.8, -75.8), c(36.75, 36.75, 41.2, 36.75))
 mem.crop <- SpatialPolygons(list(Polygons(list(Polygon(mem.crop)),
                                           'Memory-Wasting Ocean')),
                             proj4string = CRS(proj4string(midstates)))
