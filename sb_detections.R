@@ -31,24 +31,25 @@ secor.sb$array <- ifelse(arr('cbl'), 'CBL Pier',
             ifelse(arr('nan'), 'Nanticoke',
             ifelse(arr('poco'), 'Pocomoke',
             ifelse(arr('repo'), 'Reports',
-            ifelse(arr('vims|york'), 'York',
+            ifelse(arr('rapp'), 'Rappahannock',
+            ifelse(arr('vims|^y'), 'York',
+            ifelse(arr('^nn') |
+                     secor.sb$station %in% c('NH8', 'NH10'), 'James',
+            ifelse(secor.sb$station %in% c('APM1',
+                                           paste0('NH', 12:35)), 'Elizabeth',
             ifelse(arr('sandy|barnegat|shark'), 'New Jersey',
             ifelse(arr('fire|jones|montauk|rockaway|shinnecock|swg'), 'Long Island',
-            ifelse(arr('dmf|vine|cz|ph|nera|plum|joppa') |
-                     secor.sb$station %in% c('CA3', 'ER1', 'ER2', 'ER3', 'ER5',
-                                             'ER6'), 'Mass',
+            ifelse(arr('dmf|vine|cz|ph|nera|plum|joppa|^er|ca\\d'), 'Mass',
             ifelse(secor.sb$station %in% c('Alexandria', 'Dogue Creek',
                     'Hains Point', 'Mattawoman', 'National Harbor',
-                    'Piscataway', 'Pomonkey', 'Radar Tower',
-                    'Roosevelt Br.', 'S. Capitol Br.', 'S. Craney Isl.'),
-                         'DDOE',
+                    'Piscataway', 'Pomonkey', 'Radar Tower', 'Roosevelt Br.',
+                    'S. Capitol Br.', 'S. Craney Isl.'), 'DDOE',
             ifelse(secor.sb$station %in% c('Benedicts Bridge', 'Broomes',
                     'Jacks North', 'Jacks South', 'Magruders', 'Pepco',
-                    'SERC Active'),
-                         'SERC',
-            ifelse(secor.sb$station %in% c('CC LS', 'LC2', 'NCD', 'NN 1ER FWS',
-                    'NN 22 NOAA SP', 'NN DANGER FWS', 'Y wat'), 'Navy',
-                    'Other'))))))))))))))))))
+                    'SERC Active'), 'SERC',
+            ifelse(arr('B1|CBB|LC|ts\\d|\\dch') | 
+                     secor.sb$station %in% c('CC LS', 'CH', 'NCD'), 'Navy',
+                    'Other')))))))))))))))))))))
 
 tag.data <- read.csv('p:/obrien/biotelemetry/striped bass/taggingdata.csv',
                      stringsAsFactors = F)
