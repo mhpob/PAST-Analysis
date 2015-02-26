@@ -32,13 +32,13 @@ secor.sb <- secor.sb %>%
   arrange(date.local) %>% 
   as.data.frame()
 
-dist <- read.csv('distances.csv', stringsAsFactors = F)
+dist <- read.csv('movement/distances.csv', stringsAsFactors = F)
 row.names(dist) <- dist[, 1]
-names(dist)[2:120] <- dist[, 1]
-dist <- dist[,2:120]
+names(dist)[2:dim(dist)[2]] <- dist[, 1]
+dist <- dist[, 2:dim(dist)[2]]
 
 d.adj <- function(data){
-  spl <- split(data, data[, 'transmitter'])
+  spl <- split(secor.sb, secor.sb[, 'transmitter'])
   for(k in 1:length(spl)) {
     for(i in 1:dim(spl[[k]])[1]) {
       if(i == dim(spl[[k]])[1] | i == 1){
@@ -70,12 +70,11 @@ speed <- function(data){
                       mean.sp.bl = (mean.sp * 1000) / length,
                       max.sp = length / 1000 * 8) #(8 body lengths/s in m/s)
   
-  hold[is.na(hold)] <- 0
-  hold[is.infinite(hold$mean.sp), 'mean.sp'] <- 0
-  hold[is.infinite(hold$mean.sp.bl), 'mean.sp.bl'] <- 0
-  hold[hold$mean.sp > hold$max.sp, 'mean.sp'] <- 0
-  hold[hold$mean.sp.bl > 8, 'mean.sp.bl'] <- 0 #(8 body lengths/s)
-  hold
+  hold <- hold[!is.infinite(hold$mean.sp) & !is.infinite(hold$mean.sp.bl) &
+                 !is.na(hold$mean.sp) & !is.na(hold$mean.sp.bl),]
+
+  hold <- hold[hold$mean.sp <= hold$max.sp,]
+  hold <- hold[hold$mean.sp.bl <= 8,] #(8 body lengths/s)
 }
 
 secor.sb <- speed(secor.sb)
@@ -83,51 +82,53 @@ secor.sb <- speed(secor.sb)
 
 rm(dist, d.adj, speed)
 
-## Plotting --------------------------------------------------------------------
-library(ggplot2)
+save(secor.sb, file = 'movement/sb_speed.rda')
 
-ggplot() + geom_histogram(data = filter(secor.sb,
-                                        mean.sp.bl > 0, mean.sp.bl < 8,
-                                        sex %in% c('M', 'F')),
-                          aes(x= mean.sp.bl, fill = sex),
-                          binwidth = 0.5, position = 'dodge')
-
-ggplot() + geom_histogram(data = filter(secor.sb,
-                                        mean.sp.bl > 0),
-                          aes(x= mean.sp, fill = length.bin),
-                          binwidth = 0.5, position = 'dodge')
-
-ggplot() + geom_histogram(data = filter(secor.sb,
-                                        mean.sp.bl > 0),
-                          aes(x= mean.sp, fill = phase),
-                          binwidth = 0.5, position = 'dodge')
-
-ggplot() + geom_bar(data = filter(secor.sb,
-                                  mean.sp.bl > 0),
-                    aes(x= mean.sp.bl, fill = length.bin),
-                    binwidth = 0.5, position = 'dodge') +
-  labs(x = expression('Mean Speed (Body length sec' ^-1 *')'))
-
-ggplot() + geom_bar(data = filter(secor.sb, mean.sp > 0, sex %in% c('M', 'F')),
-                    aes(x= mean.sp.bl, y = ..density.., fill = sex),
-                    binwidth = 0.5, position = 'dodge') +
-  facet_wrap(~system) +
-  labs(x = expression('Mean Speed (Body length sec' ^-1 *')'),
-       y = 'Density')
-
-ggplot() + geom_point(data = filter(secor.sb, mean.sp > 0),
-                      aes(x = date.local, y = mean.sp.bl,
-                          color = sex))+
-  facet_wrap(~system)
-
-
-## Leftover stuff I might need later.
-ches <- old %>%
-  filter(lat >= 36.871, lat <= 39.648, long >= -77.498, long <= -75.619)
-
-left <- old %>%
-  anti_join(ches, by = 'station')
-
-k <- left %>%
-  select(transmitter, station, length, weight, sex) %>%
-  distinct()
+# ## Plotting --------------------------------------------------------------------
+# library(ggplot2)
+# 
+# ggplot() + geom_histogram(data = filter(secor.sb,
+#                                         mean.sp.bl > 0,
+#                                         sex %in% c('M', 'F')),
+#                           aes(x= mean.sp.bl, fill = sex),
+#                           binwidth = 0.5, position = 'dodge')
+# 
+# ggplot() + geom_histogram(data = filter(secor.sb,
+#                                         mean.sp.bl > 0),
+#                           aes(x= mean.sp, fill = length.bin),
+#                           binwidth = 0.5, position = 'dodge')
+# 
+# ggplot() + geom_histogram(data = filter(secor.sb,
+#                                         mean.sp.bl > 0),
+#                           aes(x= mean.sp, fill = phase),
+#                           binwidth = 0.5, position = 'dodge')
+# 
+# ggplot() + geom_bar(data = filter(secor.sb,
+#                                   mean.sp.bl > 0),
+#                     aes(x= mean.sp.bl, fill = length.bin),
+#                     binwidth = 0.5, position = 'dodge') +
+#   labs(x = expression('Mean Speed (Body length sec' ^-1 *')'))
+# 
+# ggplot() + geom_bar(data = filter(secor.sb, mean.sp > 0, sex %in% c('M', 'F')),
+#                     aes(x= mean.sp.bl, y = ..density.., fill = sex),
+#                     binwidth = 0.5, position = 'dodge') +
+#   facet_wrap(~system) +
+#   labs(x = expression('Mean Speed (Body length sec' ^-1 *')'),
+#        y = 'Density')
+# 
+# ggplot() + geom_point(data = filter(secor.sb, mean.sp > 0),
+#                       aes(x = date.local, y = mean.sp.bl,
+#                           color = sex))+
+#   facet_wrap(~system)
+# 
+# 
+# ## Leftover stuff I might need later.
+# ches <- old %>%
+#   filter(lat >= 36.871, lat <= 39.648, long >= -77.498, long <= -75.619)
+# 
+# left <- old %>%
+#   anti_join(ches, by = 'station')
+# 
+# k <- left %>%
+#   select(transmitter, station, length, weight, sex) %>%
+#   distinct()
