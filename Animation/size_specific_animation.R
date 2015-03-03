@@ -63,15 +63,18 @@ saveVideo({
                                    labels = c('<55', '55-65', '65-80', '>80'),
                                    limits = c('<55', '55-65', '65-80', '>80'),
                                    guide = guide_legend(override.aes =
-                                                          list(size=10))) +
+                                                          list(size = 10))) +
                 annotate("text", x = -76, y = 41.5, size = 10,
                            label = dates[i], color = 'white') +
                 ggtitle('Striped Bass Detections') +
                 theme(plot.background = element_blank(),
-                        axis.text = element_blank(),
-                        axis.title = element_blank(),
-                        rect = element_blank(),
-                        line = element_blank())
+                      axis.text = element_blank(),
+                      axis.title = element_blank(),
+                      rect = element_blank(),
+                      line = element_blank(),
+                      legend.text = element_text(size = 20),
+                      legend.title = element_text(size = 20),
+                      title = element_text(size = 20))
   
   plot2 <- ggplotGrob(map2 + geom_point(data =
                                filter(anim.data, date.floor == dates[i],
@@ -98,7 +101,6 @@ saveVideo({
   print(plot)
   ani.pause()
   }
-  }, interval = 0.5, video.name = 'sb_sizespec_ani.mp4',
+  }, interval = 0.5, video.name = 'sb_sizespec_ani.avi',
   ffmpeg = 'C:/Program Files/ImageMagick-6.9.0-Q8/ffmpeg.exe',
-  ani.height = 720, ani.width = 1280,
-  other.opts = "-b 300k")
+  ani.height = 720, ani.width = 1280)
