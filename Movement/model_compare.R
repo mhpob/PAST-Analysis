@@ -3,13 +3,13 @@ load('movement/sb.speed.rda')
 library(dplyr)
 spawn <- sb.speed %>% 
   filter(phase == 'spawning',
-         dist >= 1.8, mean.sp.bl <= 8) %>% 
-  select(dist)
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
 
 run <- sb.speed %>% 
   filter(phase == 'running',
-         dist >= 1.8, mean.sp.bl <= 8) %>% 
-  select(dist)
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
 
 m.size <- sb.speed %>% 
   filter(length.bin == '55-65',
@@ -31,7 +31,7 @@ param <- function(data){
   list(a = min(data), b = max(data), n = length(data))
 }
 
-Data <- spawn$dist
+Data <- spawn$mean.sp.bl
 abn <- param(Data)
 
 
@@ -218,7 +218,7 @@ plb <- list(mu = plb_out$estimate,
 rm(mu.start, plb_out, C, n.param, AIC, BIC, muvec, plb_muvary, i, critval)
 
 
-### Exp Neg-loglikelihood ------------------------------------------------------
+### ExpB Neg-loglikelihood ------------------------------------------------------
 lambda.start <- 0.1
 expb_out <- nlm(expb_nll, lambda.start, data = Data,
                 n = abn$n, a = abn$a, b = abn$b)
