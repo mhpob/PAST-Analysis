@@ -66,57 +66,57 @@ d.adj <- function(data){
 secor.sb <- d.adj(secor.sb)
 
 speed <- function(data){
-  hold <- data %>% mutate(mean.sp = dist / time * 1000,
-                      mean.sp.bl = (mean.sp * 1000) / length,
-                      max.sp = length / 1000 * 8) #(8 body lengths/s in m/s)
+  hold <- data %>%
+    filter(time > 60,
+           dist > 0) %>% 
+    mutate(mean.sp = dist / time * 1000,
+           mean.sp.bl = (mean.sp * 1000) / length,
+           max.sp = length / 1000 * 8) #(8 body lengths/s in m/s)
   
   hold <- hold[!is.infinite(hold$mean.sp) & !is.infinite(hold$mean.sp.bl) &
                  !is.na(hold$mean.sp) & !is.na(hold$mean.sp.bl),]
-
-  hold <- hold[hold$mean.sp <= hold$max.sp,]
-  hold <- hold[hold$mean.sp.bl <= 8,] #(8 body lengths/s)
 }
 
-secor.sb <- speed(secor.sb)
+sb.speed <- speed(secor.sb)
 
 
-rm(dist, d.adj, speed)
+rm(dist, d.adj, speed, secor.sb)
 
-save(secor.sb, file = 'movement/sb_speed.rda')
+save(sb.speed, file = 'movement/sb.speed.rda')
 
 # ## Plotting --------------------------------------------------------------------
 # library(ggplot2)
 # 
-# ggplot() + geom_histogram(data = filter(secor.sb,
+# ggplot() + geom_histogram(data = filter(sb.speed,
 #                                         mean.sp.bl > 0,
 #                                         sex %in% c('M', 'F')),
 #                           aes(x= mean.sp.bl, fill = sex),
 #                           binwidth = 0.5, position = 'dodge')
 # 
-# ggplot() + geom_histogram(data = filter(secor.sb,
+# ggplot() + geom_histogram(data = filter(sb.speed,
 #                                         mean.sp.bl > 0),
 #                           aes(x= mean.sp, fill = length.bin),
 #                           binwidth = 0.5, position = 'dodge')
 # 
-# ggplot() + geom_histogram(data = filter(secor.sb,
+# ggplot() + geom_histogram(data = filter(sb.speed,
 #                                         mean.sp.bl > 0),
 #                           aes(x= mean.sp, fill = phase),
 #                           binwidth = 0.5, position = 'dodge')
 # 
-# ggplot() + geom_bar(data = filter(secor.sb,
+# ggplot() + geom_bar(data = filter(sb.speed,
 #                                   mean.sp.bl > 0),
 #                     aes(x= mean.sp.bl, fill = length.bin),
 #                     binwidth = 0.5, position = 'dodge') +
 #   labs(x = expression('Mean Speed (Body length sec' ^-1 *')'))
 # 
-# ggplot() + geom_bar(data = filter(secor.sb, mean.sp > 0, sex %in% c('M', 'F')),
+# ggplot() + geom_bar(data = filter(sb.speed, mean.sp > 0, sex %in% c('M', 'F')),
 #                     aes(x= mean.sp.bl, y = ..density.., fill = sex),
 #                     binwidth = 0.5, position = 'dodge') +
 #   facet_wrap(~system) +
 #   labs(x = expression('Mean Speed (Body length sec' ^-1 *')'),
 #        y = 'Density')
 # 
-# ggplot() + geom_point(data = filter(secor.sb, mean.sp > 0),
+# ggplot() + geom_point(data = filter(sb.speed, mean.sp > 0),
 #                       aes(x = date.local, y = mean.sp.bl,
 #                           color = sex))+
 #   facet_wrap(~system)
