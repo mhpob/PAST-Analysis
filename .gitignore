@@ -16,5 +16,6 @@ Thumbs.db
 
 # Striped bass data
 secor.sb.rda
-sb_speed.rda
+sb.speed.rda
 distances.csv
+modelparams.xlsx
