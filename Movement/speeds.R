@@ -67,9 +67,9 @@ secor.sb <- d.adj(secor.sb)
 
 speed <- function(data){
   hold <- data %>%
-    filter(time > 60,
+    filter(time > 40, # 40s is minimum ping interval for these tags
            dist > 0) %>% 
-    mutate(mean.sp = dist / time * 1000,
+    mutate(mean.sp = dist / time * 1000, # mean speed, m/s
            mean.sp.bl = (mean.sp * 1000) / length,
            max.sp = length / 1000 * 8) #(8 body lengths/s in m/s)
   

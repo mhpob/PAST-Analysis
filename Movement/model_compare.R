@@ -1,40 +1,3 @@
-### Data -----------------------------------------------------------------------
-load('movement/sb.speed.rda')
-library(dplyr)
-spawn <- sb.speed %>% 
-  filter(phase == 'spawning',
-         mean.sp.bl <= 8) %>% 
-  select(mean.sp.bl)
-
-run <- sb.speed %>% 
-  filter(phase == 'running',
-         mean.sp.bl <= 8) %>% 
-  select(mean.sp.bl)
-
-m.size <- sb.speed %>% 
-  filter(length.bin == '55-65',
-         mean.sp.bl > 0) %>% 
-  select(mean.sp.bl)
-
-l.size <- sb.speed %>% 
-  filter(length.bin == '65-80',
-         mean.sp.bl > 0) %>% 
-  select(mean.sp.bl)
-
-xl.size <- sb.speed %>% 
-  filter(length.bin == '>80',
-         mean.sp.bl > 0) %>% 
-  select(mean.sp.bl)
-
-
-param <- function(data){
-  list(a = min(data), b = max(data), n = length(data))
-}
-
-Data <- spawn$mean.sp.bl
-abn <- param(Data)
-
-
 ### Negative log-likelihood equations -------------------------------------------
 
 # Unbounded power law (infinite tail)
@@ -78,12 +41,175 @@ expb_nll = function(lambda, data, n, a, b){
 
 
 
+### Data -----------------------------------------------------------------------
+load('movement/sb.speed.rda')
+library(dplyr)
+spawn <- sb.speed %>% 
+  filter(phase == 'spawning',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+run <- sb.speed %>% 
+  filter(phase == 'running',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+sp.pot <- sb.speed %>% 
+  filter(phase == 'spawning',
+         system == 'Potomac',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+r.pot <- sb.speed %>% 
+  filter(phase == 'running',
+         system == 'Potomac',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+
+med <- sb.speed %>% 
+  filter(length.bin == '55-65',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+m.spawn <- sb.speed %>% 
+  filter(length.bin == '55-65',
+         phase == 'spawning',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+m.run <- sb.speed %>% 
+  filter(length.bin == '55-65',
+         phase == 'running',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+m.male <- sb.speed %>% 
+  filter(length.bin == '55-65',
+         sex == 'M',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+m.female <- sb.speed %>% 
+  filter(length.bin == '55-65',
+         sex == 'F',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+l <- sb.speed %>% 
+  filter(length.bin == '65-80',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+l.spawn <- sb.speed %>% 
+  filter(length.bin == '65-80',
+         phase == 'spawning',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+l.run <- sb.speed %>% 
+  filter(length.bin == '65-80',
+         phase == 'running',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+l.male <- sb.speed %>% 
+  filter(length.bin == '65-80',
+         sex == 'M',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+l.female <- sb.speed %>% 
+  filter(length.bin == '65-80',
+         sex == 'F',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+
+xl <- sb.speed %>% 
+  filter(length.bin == '>80',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+xl.spawn <- sb.speed %>% 
+  filter(length.bin == '>80',
+         phase == 'spawning',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+xl.run <- sb.speed %>% 
+  filter(length.bin == '>80',
+         phase == 'running',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+xl.male <- sb.speed %>% 
+  filter(length.bin == '>80',
+         sex == 'M',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+xl.female <- sb.speed %>% 
+  filter(length.bin == '>80',
+         sex == 'F',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+male <- sb.speed %>% 
+  filter(sex == 'M',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+male.spawn <- sb.speed %>% 
+  filter(sex == 'M',
+         phase == 'spawning',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+male.run <- sb.speed %>% 
+  filter(sex == 'M',
+         phase == 'running',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+female <-  sb.speed %>% 
+  filter(sex == 'F',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+female.spawn <-  sb.speed %>% 
+  filter(sex == 'F',
+         phase == 'spawning',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+female.run <-  sb.speed %>% 
+  filter(sex == 'F',
+         phase == 'running',
+         mean.sp.bl <= 8) %>% 
+  select(mean.sp.bl)
+
+run.15 <- sb.speed %>% 
+  filter(phase == 'running',
+         mean.sp.bl <= 8) %>% 
+  sample_frac(0.15) %>% 
+  select(mean.sp.bl)
+
+
+param <- function(data){
+  list(a = min(data), b = max(data), n = length(data))
+}
+
+Data <- sp.pot$mean.sp.bl
+abn <- param(Data)
+
+
 ### PL Neg-loglikelihood -------------------------------------------------------
 ## Analytical solution (Box 1 of Edwards et al. 2007):
 pl_muanal <- 1/(-log(abn$a) + sum(log(Data)) / abn$n) + 1
 
 ## Numerical solution, check to make sure this matches with analytical
-mu.start <- ifelse(pl_muanal - 0.1 <= 1, 1.05, pl_muanal - 0.1)
+mu.start <- ifelse(pl_muanal - 0.1 < 1.05, 1.05, pl_muanal - 0.1)
 pl_out <- nlm(pl_nll, mu.start, data = Data, n = abn$n, a = abn$a)
 # µ estimate is pl_out$estimate
 # Negative log likelihood is pl_out$minimum
