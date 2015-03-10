@@ -30,6 +30,8 @@ secor.sb$array <- ifelse(arr('cbl'), 'CBL Pier',
             ifelse(arr('marsh'), 'Marshyhope',
             ifelse(arr('nan'), 'Nanticoke',
             ifelse(arr('poco'), 'Pocomoke',
+            ifelse(arr('elk'), 'Elk',
+            ifelse(arr('&| 32'), 'C&D',
             ifelse(arr('repo'), 'Reports',
             ifelse(arr('rapp'), 'Rappahannock',
             ifelse(arr('vims|^y'), 'York',
@@ -37,6 +39,7 @@ secor.sb$array <- ifelse(arr('cbl'), 'CBL Pier',
                      secor.sb$station %in% c('NH8', 'NH10'), 'James',
             ifelse(secor.sb$station %in% c('APM1',
                                            paste0('NH', 12:35)), 'Elizabeth',
+            ifelse(arr('# 1|# 2|# 3'), 'Delaware',
             ifelse(arr('sandy|barnegat|shark'), 'New Jersey',
             ifelse(arr('fire|jones|montauk|rockaway|shinnecock|swg'), 'Long Island',
             ifelse(arr('dmf|vine|cz|ph|nera|plum|joppa|^er|ca\\d'), 'Mass',
@@ -49,7 +52,7 @@ secor.sb$array <- ifelse(arr('cbl'), 'CBL Pier',
                     'SERC Active'), 'SERC',
             ifelse(arr('B1|CBB|LC|ts\\d|\\dch') | 
                      secor.sb$station %in% c('CC LS', 'CH', 'NCD'), 'Navy',
-                    'Other')))))))))))))))))))))
+                    'Other'))))))))))))))))))))))))
 
 tag.data <- read.csv('p:/obrien/biotelemetry/striped bass/taggingdata.csv',
                      stringsAsFactors = F)
