@@ -20,39 +20,34 @@ secor.sb <- detects %>%
 
 arr <- function(part){grepl(part, secor.sb[, 'station'], ignore.case = T)}
   
-secor.sb$array <- ifelse(arr('cbl'), 'CBL Pier',
-            ifelse(arr('cedar'), 'Cedar Point',
-            ifelse(arr('piney'), 'Piney Point',
-            ifelse(arr('pot'), 'CBIBS',
-            ifelse(arr('301'), 'Rt 301',
-            ifelse(arr('kent'), 'Kent Island',
-            ifelse(arr('chop'), 'Choptank',
-            ifelse(arr('marsh'), 'Marshyhope',
-            ifelse(arr('nan'), 'Nanticoke',
-            ifelse(arr('poco'), 'Pocomoke',
-            ifelse(arr('elk'), 'Elk',
-            ifelse(arr('&| 32'), 'C&D',
-            ifelse(arr('repo'), 'Reports',
-            ifelse(arr('rapp'), 'Rappahannock',
-            ifelse(arr('vims|^y'), 'York',
-            ifelse(arr('^nn') |
-                     secor.sb$station %in% c('NH8', 'NH10'), 'James',
-            ifelse(secor.sb$station %in% c('APM1',
-                                           paste0('NH', 12:35)), 'Elizabeth',
-            ifelse(arr('# 1|# 2|# 3'), 'Delaware',
-            ifelse(arr('sandy|barnegat|shark'), 'New Jersey',
-            ifelse(arr('fire|jones|montauk|rockaway|shinnecock|swg'), 'Long Island',
-            ifelse(arr('dmf|vine|cz|ph|nera|plum|joppa|^er|ca\\d'), 'Mass',
-            ifelse(secor.sb$station %in% c('Alexandria', 'Dogue Creek',
-                    'Hains Point', 'Mattawoman', 'National Harbor',
-                    'Piscataway', 'Pomonkey', 'Radar Tower', 'Roosevelt Br.',
-                    'S. Capitol Br.', 'S. Craney Isl.'), 'DDOE',
-            ifelse(secor.sb$station %in% c('Benedicts Bridge', 'Broomes',
-                    'Jacks North', 'Jacks South', 'Magruders', 'Pepco',
-                    'SERC Active'), 'SERC',
-            ifelse(arr('B1|CBB|LC|ts\\d|\\dch') | 
-                     secor.sb$station %in% c('CC LS', 'CH', 'NCD'), 'Navy',
-                    'Other'))))))))))))))))))))))))
+secor.sb$array <- 
+      ifelse(arr('piney|pot'), 'Lower Potomac',
+      ifelse(arr('301|rad'), 'Mid Potomac',
+      ifelse(secor.sb$station %in% c('Alexandria', 'Dogue Creek', 'Hains Point',
+                  'Mattawoman', 'National Harbor', 'Piscataway', 'Pomonkey',
+                  'Roosevelt Br.', 'S. Capitol Br.', 'S. Craney Isl.'),
+             'Upper Potomac',
+      ifelse(arr('cbl') | secor.sb$station %in% c('Benedicts Bridge', 'Broomes',
+                  'Jacks North', 'Jacks South', 'Magruders', 'Pepco',
+                  'SERC Active'), 'Patuxent',
+      ifelse(arr('kent|annap'), 'Mid MD Bay',
+      ifelse(arr('cedar|goose'), 'Lower MD Bay',
+      ifelse(arr('elk|pata'), 'Upper MD Bay',
+      ifelse(arr('&| 32'), 'C&D',
+      ifelse(arr('repo'), 'Reports',
+      ifelse(arr('rapp'), 'Rappahannock',
+      ifelse(arr('vims|^y'), 'York',
+      ifelse(arr('^nn') |
+               secor.sb$station %in% c('NH8', 'NH10'), 'James',
+      ifelse(secor.sb$station %in% c('APM1',
+                                     paste0('NH', 12:35)), 'Elizabeth',
+      ifelse(arr('# 1|# 2|# 3'), 'Delaware',
+      ifelse(arr('sandy|barnegat|shark'), 'New Jersey',
+      ifelse(arr('fire|jones|montauk|rockaway|shinnecock|swg'), 'Long Island',
+      ifelse(arr('dmf|vine|cz|ph|nera|plum|joppa|^er|ca\\d'), 'Mass',
+      ifelse(arr('B1|CBB|LC|ts\\d|\\dch') |
+               secor.sb$station %in% c('CC LS', 'CH', 'NCD'), 'Bay Mouth',
+             'Other'))))))))))))))))))
 
 tag.data <- read.csv('p:/obrien/biotelemetry/striped bass/taggingdata.csv',
                      stringsAsFactors = F)
