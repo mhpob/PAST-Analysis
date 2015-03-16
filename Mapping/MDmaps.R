@@ -98,3 +98,31 @@ ggplot() + geom_polygon(data = pot, fill = 'darkgrey', color = 'black',
   labs(x = 'Longitude', y = 'Latitude',
        title = 'Potomac Receivers (Stations with Striped Bass Detections in Blue)') +
   theme_bw()
+
+
+## Whole Bay
+cbrecs <- secor.sb %>% filter(secor.sb$array %in% c('C&D', 'CBIBS', 'Elizabeth',
+                  'Elk', 'James', 'Navy', 'Rappahannock', 'York')) %>% 
+  data.frame()
+arr <- function(part){grepl(part, cbrecs[, 'station'], ignore.case = T)}
+
+cbrecs$Group <- ifelse(arr('pot'), 'NOAA',
+            ifelse(arr('elk|&| 32'), 'DSU',
+            ifelse(arr('rapp|vims'), 'VIMS',
+            ifelse(arr('^y|^nn|^nh|B1|CBB|LC|ts\\d|\\dch') | 
+                     cbrecs$station %in% c('APM1', 'CC LS', 'CH', 'NCD'), 'Navy',
+                    'Other'))))
+
+sites <- rbind(stations[, c(10,12,13)],
+              setNames(unique(cbrecs[, c(14, 6, 7)]), names(stations[, c(10,12,13)])))
+
+ggplot() + geom_polygon(data = pot, fill = 'darkgrey', color = 'black',
+                        aes(long,lat, group = group)) +
+  coord_map(xlim = c(-77.4, -75.3), ylim = c(36.8, 39.6)) +
+  geom_point(data = sites,
+             aes(Dec.Long, Dec.Lat, color = Group), size = 5) +
+  scale_color_manual(values = c('green', 'darkorange', 'blue', 'yellow',
+                                'purple', 'pink', 'gold', 'red')) +
+  labs(x = 'Longitude', y = 'Latitude', title = 'Chesapeake Receivers') +
+  theme_bw() + theme(legend.text = element_text(size = 12),
+                     legend.title = element_text(size = 14))

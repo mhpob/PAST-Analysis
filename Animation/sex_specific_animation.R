@@ -38,7 +38,7 @@ map <- openmap(c(42.95, -77.5), c(36.5, -69), type = 'mapquest-aerial')
 map <- autoplot.OpenStreetMap(openproj(map))
 
 dates <- seq(as.Date('2014-03-30'),
-             as.Date('2015-01-15'), by = 'day')
+             as.Date('2015-01-31'), by = 'day')
 
 map2 <- openmap(c(39.356, -77.371), c(37.897, -75.626),
                 type = 'mapquest-aerial')
@@ -90,7 +90,7 @@ saveVideo({
   print(plot)
   ani.pause()
   }
-  }, interval = 0.5, video.name = 'sb_sexspec_ani.mp4',
+  }, interval = 0.2, video.name = 'sb_sexspec_ani.mp4',
   ffmpeg = 'C:/Program Files/ImageMagick-6.9.0-Q8/ffmpeg.exe',
   ani.height = 720, ani.width = 1280,
   other.opts = "-b 300k")
