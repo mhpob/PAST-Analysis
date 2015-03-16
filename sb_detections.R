@@ -22,19 +22,19 @@ arr <- function(part){grepl(part, secor.sb[, 'station'], ignore.case = T)}
   
 secor.sb$array <- 
       ifelse(arr('piney|pot'), 'Lower Potomac',
-      ifelse(arr('301|rad'), 'Mid Potomac',
+      ifelse(arr('301|rad') | secor.sb$station == 'Report1', 'Mid Potomac',
       ifelse(secor.sb$station %in% c('Alexandria', 'Dogue Creek', 'Hains Point',
                   'Mattawoman', 'National Harbor', 'Piscataway', 'Pomonkey',
-                  'Roosevelt Br.', 'S. Capitol Br.', 'S. Craney Isl.'),
+                  'Roosevelt Br.', 'S. Capitol Br.', 'S. Craney Isl.', 'Report2'),
              'Upper Potomac',
       ifelse(arr('cbl') | secor.sb$station %in% c('Benedicts Bridge', 'Broomes',
                   'Jacks North', 'Jacks South', 'Magruders', 'Pepco',
                   'SERC Active'), 'Patuxent',
-      ifelse(arr('kent|annap'), 'Mid MD Bay',
+      ifelse(arr('kent|annap') | secor.sb$station %in% c('Report3', 'Report7'),
+             'Mid MD Bay',
       ifelse(arr('cedar|goose'), 'Lower MD Bay',
-      ifelse(arr('elk|pata'), 'Upper MD Bay',
+      ifelse(arr('elk|pata') | secor.sb$station == 'Report5', 'Upper MD Bay',
       ifelse(arr('&| 32'), 'C&D',
-      ifelse(arr('repo'), 'Reports',
       ifelse(arr('rapp'), 'Rappahannock',
       ifelse(arr('vims|^y'), 'York',
       ifelse(arr('^nn') |
@@ -43,11 +43,12 @@ secor.sb$array <-
                                      paste0('NH', 12:35)), 'Elizabeth',
       ifelse(arr('# 1|# 2|# 3'), 'Delaware',
       ifelse(arr('sandy|barnegat|shark'), 'New Jersey',
-      ifelse(arr('fire|jones|montauk|rockaway|shinnecock|swg'), 'Long Island',
+      ifelse(arr('fire|jones|montauk|rockaway|shinnecock|swg') |
+               secor.sb$station == 'Report4', 'Long Island',
       ifelse(arr('dmf|vine|cz|ph|nera|plum|joppa|^er|ca\\d'), 'Mass',
       ifelse(arr('B1|CBB|LC|ts\\d|\\dch') |
                secor.sb$station %in% c('CC LS', 'CH', 'NCD'), 'Bay Mouth',
-             'Other'))))))))))))))))))
+             'Other')))))))))))))))))
 
 tag.data <- read.csv('p:/obrien/biotelemetry/striped bass/taggingdata.csv',
                      stringsAsFactors = F)
