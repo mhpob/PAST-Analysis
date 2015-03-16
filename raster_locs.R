@@ -22,16 +22,24 @@ tag.info <- secor.sb %>%
          date.floor = lubridate::floor_date(tag.date, unit = 'day'),
          system = ifelse(tag.date < ymd('2014-10-29', tz = 'America/New_York'),
                          'Mid Potomac', 'Lower Potomac')) %>% 
-  select(date.floor, trans.num, system, length)
+  select(tag.date, date.floor, trans.num, system, length)
 
 secor.sb <- secor.sb %>%
   mutate(date.floor = lubridate::floor_date(date.local, unit = 'day')) %>% 
   distinct(date.floor, trans.num) %>% 
-  select(date.floor, trans.num, system, length) %>%
-  rbind(., tag.info)
+  select(tag.date, date.floor, trans.num, system, length) %>%
+  rbind(., tag.info) %>% 
+  mutate(tag.round = ifelse(tag.date < ymd('2014-10-29', tz = 'America/New_York'),
+                            'A', 'B')) %>% 
+  arrange(desc(tag.round), length, trans.num)
 
-secor.sb$trans.num <- factor(secor.sb$trans.num,
-                             levels = secor.sb$trans.num[order(secor.sb$length)])
+hold <- data.frame(trans.num = unique(secor.sb$trans.num),
+                   plot.order = seq(1:length(unique(secor.sb$trans.num))))
+secor.sb <- secor.sb %>% 
+  left_join(hold)
+
+# secor.sb$trans.num <- factor(secor.sb$trans.num,
+#                              levels = secor.sb$trans.num[order(secor.sb$length)])
 
 pot.cols <- colorRampPalette(c('lightgreen', 'darkgreen'))(3)
 bay.cols <- colorRampPalette(c('red', 'orange'))(2)
@@ -42,12 +50,17 @@ cols <- c('Upper Potomac' = pot.cols[1], 'Mid Potomac' = pot.cols[2],
           'Virginia' = bay.cols[2], 'C&D' = else.cols[1], 'Delaware' = else.cols[2],
           'Mass' = else.cols[3], 'NY Bight' = else.cols[4])
 
+labels <- secor.sb %>% 
+  distinct(trans.num, length) %>% 
+  select(length) %>% 
+  data.frame()
+labels <- as.numeric(labels[,1])
 
-ggplot() + geom_raster(data = secor.sb, aes(x = date.floor, y = trans.num,
+ggplot() + geom_raster(data = secor.sb, aes(x = date.floor, y = as.factor(plot.order),
                                             fill = system)) +
-  labs(x = 'Date', y = '', fill = 'System') +
+  labs(x = 'Date', y = 'Length (mm)', fill = 'System') +
   xlim(lubridate::ymd('2014-04-12'), lubridate::ymd('2015-02-25')) +
   scale_fill_manual(values = cols, breaks = c('Upper Potomac', 'Mid Potomac',
                         'Lower Potomac', 'Maryland', 'Virginia', 'C&D', 'Delaware',
-                        'NY Bight', 'Mass'))+
-  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+                        'NY Bight', 'Mass')) +
+  scale_y_discrete(labels = labels)
