@@ -42,7 +42,7 @@ secor.sb$array <-
       ifelse(secor.sb$station %in% c('APM1',
                                      paste0('NH', 12:35)), 'Elizabeth',
       ifelse(arr('# 2|# 3'), 'Delaware',
-      ifelse(arr('#1'), 'DE Coast',
+      ifelse(arr('# 1'), 'DE Coast',
       ifelse(arr('sandy|barnegat|shark'), 'New Jersey',
       ifelse(arr('fire|jones|montauk|rockaway|shinnecock|swg') |
                secor.sb$station == 'Report4', 'Long Island',
