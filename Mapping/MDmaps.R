@@ -12,7 +12,7 @@ load('secor.sb.rda')
 det.sites <- unique(secor.sb[,6:7])
 
 png('p:/obrien/biotelemetry/striped bass/MD Receivers_Group.png',
-    width = 950, heigh = 600)
+    width = 950, height = 600)
 ggplot() + geom_polygon(data = pot, fill = 'darkgrey', color = 'black',
                         aes(long,lat, group = group)) +
   coord_map(xlim = c(-77.4, -74), ylim = c(37.8, 39.6))  +
@@ -114,7 +114,8 @@ cbrecs$Group <- ifelse(arr('pot'), 'NOAA',
                     'Other'))))
 
 sites <- rbind(stations[, c(10,12,13)],
-              setNames(unique(cbrecs[, c(14, 6, 7)]), names(stations[, c(10,12,13)])))
+              setNames(unique(cbrecs[, c(14, 6, 7)]),
+                       names(stations[, c(10,12,13)])))
 
 ggplot() + geom_polygon(data = pot, fill = 'darkgrey', color = 'black',
                         aes(long,lat, group = group)) +
@@ -126,3 +127,26 @@ ggplot() + geom_polygon(data = pot, fill = 'darkgrey', color = 'black',
   labs(x = 'Longitude', y = 'Latitude', title = 'Chesapeake Receivers') +
   theme_bw() + theme(legend.text = element_text(size = 12),
                      legend.title = element_text(size = 14))
+
+
+### Difference between ASMFC and Section 6 receivers
+stations <- stations %>% 
+  mutate(Group = ifelse(grepl('Cedar|Rt|Pine|Pier', Station), 'CBL - ASMFC',
+                 ifelse(Group == 'CBL' & !grepl('Cedar|Rt|Pine|Pier', Station),
+                        'CBL - Section 6', Group)))
+
+ggplot() + geom_polygon(data = pot, fill = 'darkgrey', color = 'black',
+                        aes(long,lat, group = group)) +
+  coord_map(xlim = c(-77.4, -74), ylim = c(37.8, 39.6))  +
+  geom_point(data = stations,
+             aes(Dec.Long, Dec.Lat, color = Group), size = 5) +
+  scale_color_manual(values = c('darkgreen', 'lightgreen', 'darkorange',
+                                'blue', 'purple')) +
+  geom_point(data = stations,
+             aes(Dec.Long, Dec.Lat), size = 5, shape = 21) +
+  labs(x = 'Longitude', y = 'Latitude', title = 'Maryland Receivers') +
+  theme_bw() + theme(legend.text = element_text(size = 18),
+                     legend.title = element_text(size = 20),
+                     axis.text = element_text(size = 15),
+                     axis.title = element_text(size = 18),
+                     title = element_text(size = 20))
