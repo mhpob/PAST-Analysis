@@ -38,7 +38,7 @@ map <- openmap(c(42.95, -77.5), c(36.5, -69), type = 'mapquest-aerial')
 map <- autoplot.OpenStreetMap(openproj(map))
 
 dates <- seq(as.Date('2014-03-30'),
-             as.Date('2015-01-31'), by = 'day')
+             as.Date('2014-12-31'), by = 'day')
 
 map2 <- openmap(c(39.356, -77.371), c(37.897, -75.626),
                 type = 'mapquest-aerial')
@@ -56,15 +56,16 @@ saveVideo({
                                    name = 'Sex', labels = c('F', 'M'),
                                    limits = c('F', 'M'),
                                    guide = guide_legend(override.aes =
-                                                          list(size=10))) +
+                                                          list(size = 10))) +
                 annotate("text", x = -76, y = 41.5, size = 10,
                            label = dates[i], color = 'white') +
-                ggtitle('Striped Bass Detections') +
                 theme(plot.background = element_blank(),
-                        axis.text = element_blank(),
-                        axis.title = element_blank(),
-                        rect = element_blank(),
-                        line = element_blank())
+                      axis.text = element_blank(),
+                      axis.title = element_blank(),
+                      rect = element_blank(),
+                      line = element_blank(),
+                      legend.text = element_text(size = 20),
+                      legend.title = element_text(size = 20))
   
   plot2 <- ggplotGrob(map2 + geom_point(data =
                                filter(anim.data, date.floor == dates[i],
@@ -90,7 +91,6 @@ saveVideo({
   print(plot)
   ani.pause()
   }
-  }, interval = 0.2, video.name = 'sb_sexspec_ani.mp4',
+  }, interval = 0.5, video.name = 'sb_sexspec_ani.mp4',
   ffmpeg = 'C:/Program Files/ImageMagick-6.9.0-Q8/ffmpeg.exe',
-  ani.height = 720, ani.width = 1280,
-  other.opts = "-b 300k")
+  ani.height = 720, ani.width = 1280)

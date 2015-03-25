@@ -43,7 +43,7 @@ map <- openmap(c(42.95, -77.5), c(36.5, -69), type = 'mapquest-aerial')
 map <- autoplot.OpenStreetMap(openproj(map))
 
 dates <- seq(as.Date('2014-03-30'),
-             as.Date('2015-01-15'), by = 'day')
+             as.Date('2014-12-31'), by = 'day')
 
 map2 <- openmap(c(39.356, -77.371), c(37.897, -75.626),
                 type = 'mapquest-aerial')
@@ -66,15 +66,13 @@ saveVideo({
                                                           list(size = 10))) +
                 annotate("text", x = -76, y = 41.5, size = 10,
                            label = dates[i], color = 'white') +
-                ggtitle('Striped Bass Detections') +
                 theme(plot.background = element_blank(),
                       axis.text = element_blank(),
                       axis.title = element_blank(),
                       rect = element_blank(),
                       line = element_blank(),
                       legend.text = element_text(size = 20),
-                      legend.title = element_text(size = 20),
-                      title = element_text(size = 20))
+                      legend.title = element_text(size = 20))
   
   plot2 <- ggplotGrob(map2 + geom_point(data =
                                filter(anim.data, date.floor == dates[i],
