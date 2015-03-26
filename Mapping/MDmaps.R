@@ -150,3 +150,30 @@ ggplot() + geom_polygon(data = pot, fill = 'darkgrey', color = 'black',
                      axis.text = element_text(size = 15),
                      axis.title = element_text(size = 18),
                      title = element_text(size = 20))
+
+### Difference between USCG, Humpty, and coastal receiver attachment
+stations <- stations %>% 
+  mutate(Group = ifelse(grepl('T-|V-|A-', Station), 'CBL - Coastal',
+                 ifelse(grepl('Kent', Station) | Station %in% c('Piney Point - A',
+                        'Piney Point - C', 'Piney Point - D', 'Cedar Point - A'),
+                        'CBL - Humpty Buoy', Group)),
+         Group = ifelse(Group == 'CBL', 'CBL - USCG', Group),
+         Group = ifelse(Station == 'CBL Pier', 'CBL Pier', Group))
+
+cblcols <- colorRampPalette(c('darkgreen', 'yellow'))(4)
+
+ggplot() + geom_polygon(data = pot, fill = 'darkgrey', color = 'black',
+                        aes(long,lat, group = group)) +
+  coord_map(xlim = c(-77.4, -74), ylim = c(37.8, 39.6))  +
+  geom_point(data = stations,
+             aes(Dec.Long, Dec.Lat, color = Group), size = 5) +
+  scale_color_manual(values = c(cblcols[1], cblcols[2], cblcols[4], cblcols[3],
+                                'darkorange', 'blue', 'purple')) +
+  geom_point(data = stations,
+             aes(Dec.Long, Dec.Lat), size = 5, shape = 21) +
+  labs(x = 'Longitude', y = 'Latitude', title = 'Maryland Receivers') +
+  theme_bw() + theme(legend.text = element_text(size = 18),
+                     legend.title = element_text(size = 20),
+                     axis.text = element_text(size = 15),
+                     axis.title = element_text(size = 18),
+                     title = element_text(size = 20))
