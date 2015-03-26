@@ -30,6 +30,7 @@ secor.sb$array <-
       ifelse(arr('cbl') | secor.sb$station %in% c('Benedicts Bridge', 'Broomes',
                   'Jacks North', 'Jacks South', 'Magruders', 'Pepco',
                   'SERC Active'), 'Patuxent',
+      ifelse(arr('chop'), 'Choptank',
       ifelse(arr('kent|annap') | secor.sb$station %in% c('Report3', 'Report7'),
              'Mid MD Bay',
       ifelse(arr('cedar|goose'), 'Lower MD Bay',
@@ -49,7 +50,7 @@ secor.sb$array <-
       ifelse(arr('dmf|vine|cz|ph|nera|plum|joppa|^er|ca\\d'), 'Mass',
       ifelse(arr('B1|CBB|LC|ts\\d|\\dch') |
                secor.sb$station %in% c('CC LS', 'CH', 'NCD'), 'Bay Mouth',
-             'Other'))))))))))))))))))
+             'Other')))))))))))))))))))
 
 tag.data <- read.csv('p:/obrien/biotelemetry/striped bass/taggingdata.csv',
                      stringsAsFactors = F)
