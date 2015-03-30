@@ -4,7 +4,7 @@ load('secor.sb.rda')
 secor.sb$system <-
   ifelse(secor.sb$array %in% c('Long Island', 'New Jersey'), 'NY Bight',
   ifelse(secor.sb$array %in% c('Upper MD Bay', 'Mid MD Bay', 'Lower MD Bay',
-                  'Other', 'Patuxent'), 'Maryland',
+                  'Other', 'Patuxent', 'Choptank'), 'Maryland',
   ifelse(secor.sb$array %in% c('Bay Mouth', 'Elizabeth', 'James',
                   'Rappahannock', 'York'), 'Virginia',
   secor.sb$array)))
@@ -43,12 +43,13 @@ secor.sb <- secor.sb %>%
 
 pot.cols <- colorRampPalette(c('lightgreen', 'darkgreen'))(3)
 bay.cols <- colorRampPalette(c('red', 'orange'))(2)
-else.cols <- colorRampPalette(c('blue', 'violet'))(4)
+else.cols <- colorRampPalette(c('blue', 'violet'))(5)
 
 cols <- c('Upper Potomac' = pot.cols[1], 'Mid Potomac' = pot.cols[2],
           'Lower Potomac' = pot.cols[3], 'Maryland' = bay.cols[1],
-          'Virginia' = bay.cols[2], 'C&D' = else.cols[1], 'Delaware' = else.cols[2],
-          'Mass' = else.cols[3], 'NY Bight' = else.cols[4])
+          'Virginia' = bay.cols[2], 'C&D' = else.cols[1],
+          'Delaware' = else.cols[2], 'DE Coast' = else.cols[3],
+          'Mass' = else.cols[4], 'NY Bight' = else.cols[5])
 
 labels <- secor.sb %>% 
   distinct(trans.num, length) %>% 
@@ -56,11 +57,12 @@ labels <- secor.sb %>%
   data.frame()
 labels <- as.numeric(labels[,1])
 
-ggplot() + geom_raster(data = secor.sb, aes(x = date.floor, y = as.factor(plot.order),
-                                            fill = system)) +
+ggplot() + geom_raster(data = secor.sb,
+                       aes(x = date.floor, y = as.factor(plot.order),
+                           fill = system)) +
   labs(x = 'Date', y = 'Length (mm)', fill = 'System') +
   xlim(lubridate::ymd('2014-04-12'), lubridate::ymd('2015-02-25')) +
   scale_fill_manual(values = cols, breaks = c('Upper Potomac', 'Mid Potomac',
-                        'Lower Potomac', 'Maryland', 'Virginia', 'C&D', 'Delaware',
-                        'NY Bight', 'Mass')) +
+                    'Lower Potomac', 'Maryland', 'Virginia', 'C&D', 'Delaware',
+                    'DE Coast', 'NY Bight', 'Mass')) +
   scale_y_discrete(labels = labels)
