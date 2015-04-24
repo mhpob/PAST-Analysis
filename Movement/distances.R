@@ -1,6 +1,6 @@
 library(gdistance); library(raster); library(rgdal); library(dplyr)
 midstates <- shapefile(
-  'p:/obrien/gis/shapefiles/midatlantic/matl_states_land.shp')
+  'c:/users/secor lab/desktop/gis products/chesapeake/midatlantic/matl_states_land.shp')
 
 # Create nonsense raster file to clip shapefile
 ras.back <- raster(extent(-77.344, -69.8, 36.75, 42.872),

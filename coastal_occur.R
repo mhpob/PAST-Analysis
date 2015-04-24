@@ -6,8 +6,8 @@ occ.data <- secor.sb %>%
   filter(date.local >= '2014-03-30',
          date.local <= '2014-10-29') %>% 
   mutate(date.floor = lubridate::floor_date(date.local, unit = 'day'),
-         coastal = ifelse(array %in% c('DE Coast', 'Long Island', 'Mass',
-                                       'New Jersey'), 'YES', 'NO')) %>% 
+         coastal = ifelse(array %in% c('MD Coast', 'DE Coast', 'Long Island',
+                                       'Mass', 'New Jersey'), 'YES', 'NO')) %>% 
   distinct(trans.num, date.floor, coastal) %>% 
   group_by(trans.num) %>% 
   summarize(length = mean(length),
@@ -26,8 +26,8 @@ ggplot(data = occ.data, aes(x = length, y = prop)) + geom_point(size = 3) +
 pres <- secor.sb %>% 
   filter(date.local >= '2014-03-30',
          date.local <= '2014-10-29') %>% 
-  mutate(coastal = ifelse(array %in% c('DE Coast', 'Long Island', 'Mass',
-                                       'New Jersey'), 1, 0)) %>% 
+  mutate(coastal = ifelse(array %in% c('MD Coast', 'DE Coast', 'Long Island',
+                                       'Mass', 'New Jersey'), 1, 0)) %>% 
   data.frame()
 
 coast <- levels(factor(pres[pres$coastal == 1, 'trans.num']))

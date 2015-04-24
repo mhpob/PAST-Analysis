@@ -4,7 +4,7 @@ library(dplyr)
 ## Fish leaving Chesapeake Bay
 bay.escapes <- secor.sb %>% 
   filter(array %in% c('C&D', 'DE Coast', 'Delaware', 'Long Island', 'Mass',
-                      'New Jersey')) 
+                      'MD Coast', 'New Jersey')) 
 bay.escapes <- levels(factor(bay.escapes$trans.num))
 bay.escapes <- secor.sb %>% 
   filter(trans.num %in% bay.escapes) %>%
@@ -49,7 +49,7 @@ lapply(pot.residents, gen.movement)
 ## Fish staying within the Chesapeake Bay
 escapes <- secor.sb %>% 
   filter(array %in% c('C&D', 'DE Coast', 'Delaware', 'Long Island', 'Mass',
-                      'New Jersey'))
+                      'MD Coast', 'New Jersey'))
 escapes <- levels(factor(escapes$trans.num))
 bay.residents <- secor.sb %>% 
   filter(!trans.num %in% escapes,
