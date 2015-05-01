@@ -43,7 +43,7 @@ map <- openmap(c(42.95, -77.5), c(36.5, -69), type = 'mapquest-aerial')
 map <- autoplot.OpenStreetMap(openproj(map))
 
 dates <- seq(as.Date('2014-03-30'),
-             as.Date('2014-12-31'), by = 'day')
+             as.Date('2015-04-01'), by = 'day')
 
 map2 <- openmap(c(39.356, -77.371), c(37.897, -75.626),
                 type = 'mapquest-aerial')
