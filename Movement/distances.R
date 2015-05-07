@@ -1,21 +1,6 @@
-library(gdistance); library(raster); library(rgdal); library(dplyr)
-midstates <- shapefile(
-  'c:/users/secor lab/desktop/gis products/chesapeake/midatlantic/matl_states_land.shp')
+library(gdistance); library(dplyr)
 
-# Create nonsense raster file to clip shapefile
-ras.back <- raster(extent(-77.344, -69.8, 36.75, 42.872),
-                   resolution = 1/360, #5 arc-second grids = 720, 10 = 360
-                   vals = 1,
-                   crs = proj4string(midstates))
-mem.crop <- cbind(c(-75.8, -69.8, -69.8, -75.8), c(36.75, 36.75, 41.2, 36.75))
-mem.crop <- SpatialPolygons(list(Polygons(list(Polygon(mem.crop)),
-                                          'Memory-Wasting Ocean')),
-                            proj4string = CRS(proj4string(midstates)))
-
-ras.water <- mask(mask(ras.back, mem.crop, inverse = T),
-                  midstates, inverse = T)
-
-rm(midstates, ras.back, mem.crop)
+ras.water <- raster('ras_water.grd')
 
 trans <- transition(ras.water, transitionFunction = function(x){1}, 16)
 geo <- geoCorrection(trans, type = 'c')
