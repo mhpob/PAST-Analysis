@@ -1,21 +1,21 @@
 # Windows image file caches
 Thumbs.db
-
 # History files
 .Rhistory
-
 # Example code in package build process
 *-Ex.R
-
 # R data files from past sessions
 .Rdata
-
 # RStudio files
 .Rproj.user/
 .Rproj.user
-
 # Striped bass data
 secor.sb.rda
 sb.speed.rda
 distances.csv
 modelparams.xlsx
+# Distance calculation files
+.httr-oauth
+ras_water*
+# Animations
+*.avi
