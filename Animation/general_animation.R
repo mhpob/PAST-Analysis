@@ -131,6 +131,6 @@ saveVideo({
     ani.pause()
   }
   }, interval = 0.5, video.name = 'sbani.mp4',
-  ffmpeg = 'C:/Program Files/ImageMagick-6.8.9-Q16/ffmpeg.exe',
+  ffmpeg = 'c:/ffmpeg/bin/ffmpeg.exe',
   ani.height = 720, ani.width = 1280,
   other.opts = "-b 300k")

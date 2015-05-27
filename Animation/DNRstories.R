@@ -51,7 +51,7 @@ saveVideo({
     ani.pause()
   }
   }, interval = 0.2, video.name = 'deharv.avi',
-  ffmpeg = 'C:/Program Files/ImageMagick-6.9.0-Q8/ffmpeg.exe',
+  ffmpeg = 'c:/ffmpeg/bin/ffmpeg.exe',
   ani.height = 720, ani.width = 1280)
 
 ### Mouth to Mass --------------------------------------------------------------
@@ -99,7 +99,7 @@ saveVideo({
     ani.pause()
   }
   }, interval = 0.2, video.name = 'cbres.avi',
-  ffmpeg = 'C:/Program Files/ImageMagick-6.9.0-Q8/ffmpeg.exe',
+  ffmpeg = 'c:/ffmpeg/bin/ffmpeg.exe',
   ani.height = 720, ani.width = 1280)
 
 ### Potomac Resident -----------------------------------------------------------
@@ -142,7 +142,7 @@ saveVideo({
     ani.pause()
   }
   }, interval = 0.2, video.name = 'potres.avi',
-  ffmpeg = 'C:/Program Files/ImageMagick-6.9.0-Q8/ffmpeg.exe',
+  ffmpeg = 'c:/ffmpeg/bin/ffmpeg.exe',
   ani.height = 720, ani.width = 1280)
 
 ### Bay Runs -------------------------------------------------------------------
@@ -185,5 +185,5 @@ saveVideo({
     ani.pause()
   }
   }, interval = 0.2, video.name = 'bayres.avi',
-  ffmpeg = 'C:/Program Files/ImageMagick-6.9.0-Q8/ffmpeg.exe',
+  ffmpeg = 'c:/ffmpeg/bin/ffmpeg.exe',
   ani.height = 720, ani.width = 1280)

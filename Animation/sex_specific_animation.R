@@ -92,5 +92,5 @@ saveVideo({
   ani.pause()
   }
   }, interval = 0.5, video.name = 'sb_sexspec_ani.avi',
-  ffmpeg = 'C:/Program Files/ImageMagick-6.9.0-Q8/ffmpeg.exe',
+  ffmpeg = 'c:/ffmpeg/bin/ffmpeg.exe',
   ani.height = 720, ani.width = 1280)
