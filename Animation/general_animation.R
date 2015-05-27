@@ -130,7 +130,7 @@ saveVideo({
     print(plot)
     ani.pause()
   }
-  }, interval = 0.5, video.name = 'sbani.mp4',
+  }, interval = 0.2, video.name = 'sbani.mp4',
   ffmpeg = 'c:/ffmpeg/bin/ffmpeg.exe',
   ani.height = 720, ani.width = 1280,
   other.opts = "-b 300k")

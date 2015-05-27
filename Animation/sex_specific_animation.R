@@ -91,6 +91,6 @@ saveVideo({
   print(plot)
   ani.pause()
   }
-  }, interval = 0.5, video.name = 'sb_sexspec_ani.avi',
+  }, interval = 0.2, video.name = 'sb_sexspec_ani.avi',
   ffmpeg = 'c:/ffmpeg/bin/ffmpeg.exe',
   ani.height = 720, ani.width = 1280)
