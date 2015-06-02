@@ -18,7 +18,7 @@ secor.sb <- detects %>%
 arr <- function(part){grepl(part, secor.sb[, 'station'], ignore.case = T)}
   
 secor.sb$array <- 
-      ifelse(arr('piney|pot'), 'Lower Potomac',
+      ifelse(arr('piney|pot|look'), 'Lower Potomac',
       ifelse(arr('301|rad') | secor.sb$station == 'Report1', 'Mid Potomac',
       ifelse(secor.sb$station %in% c('Alexandria', 'Dogue Creek', 'Hains Point',
                   'Mattawoman', 'National Harbor', 'Piscataway', 'Pomonkey',
