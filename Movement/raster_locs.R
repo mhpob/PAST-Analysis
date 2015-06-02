@@ -62,7 +62,7 @@ ggplot() + geom_raster(data = secor.sb,
                        aes(x = date.floor, y = as.factor(plot.order),
                            fill = system)) +
   labs(x = 'Date', y = 'Length (mm)', fill = 'System') +
-  xlim(lubridate::ymd('2014-04-12'), lubridate::ymd('2015-02-25')) +
+  xlim(lubridate::ymd('2014-04-12'), lubridate::ymd('2015-04-30')) +
   scale_fill_manual(values = cols, breaks = c('Upper Potomac', 'Mid Potomac',
                     'Lower Potomac', 'Maryland', 'Virginia', 'MD Coast', 'C&D',
                     'Delaware', 'DE Coast', 'NY Bight', 'Mass')) +
