@@ -17,5 +17,7 @@ modelparams.xlsx
 # Distance calculation files
 .httr-oauth
 ras_water*
-# Animations
+# Animations and music
 *.avi
+*.mp3
+*.mp4

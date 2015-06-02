@@ -102,3 +102,6 @@ saveVideo({
   }, interval = 0.2, video.name = 'sb_sizespec_ani.avi',
   ffmpeg = 'c:/ffmpeg/bin/ffmpeg.exe',
   ani.height = 720, ani.width = 1280)
+
+args <- '-i "p:/obrien/biotelemetry/striped bass/past-analysis/sb_sizespec_ani.avi" -i "p:/obrien/biotelemetry/striped bass/past-analysis/animation/ride of the valkyries.mp3" -map 0:v -map 1:a -codec copy -shortest "sb_sizespec_ani_music.mp4"'
+system2('c:/ffmpeg/bin/ffmpeg.exe', args)
