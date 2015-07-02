@@ -29,8 +29,13 @@ gen.movement <- function(data){
   track
 }
 
-lapply(bay.escapes, gen.movement)
-
+j <- lapply(bay.escapes, gen.movement)
+paste('Number that left =', length(j))
+paste('Number that got to Mass. =', length(grep('Mass', j)))
+paste('Number that got to Long Island =',
+      length(intersect(grep('Mass', j, invert = T), grep('Island', j))))
+paste('Number that got to Delaware =',
+      length(intersect(grep('Island', j, invert = T), grep('De', j))))
 
 ## Fish staying in the Potomac River
 pot.escapes <- secor.sb %>% 
