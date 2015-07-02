@@ -39,7 +39,7 @@ secor.sb$array <-
       ifelse(arr('&| 32'), 'C&D',
       ifelse(arr('rapp'), 'Rappahannock',
       ifelse(arr('vims|^y'), 'York',
-      ifelse(arr('^nn') |
+      ifelse(arr('^nn|r\\d\\d|bur|g\\d|poco|^hi') |
                secor.sb$station %in% c('NH8', 'NH10'), 'James',
       ifelse(secor.sb$station %in% c('APM1',
                                      paste0('NH', 12:35)), 'Elizabeth',
