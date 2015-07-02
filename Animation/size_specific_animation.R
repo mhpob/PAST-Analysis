@@ -12,7 +12,7 @@ anim.data <- secor.sb %>%
   distinct() %>%
   group_by(station, date.floor, length.bin) %>%
   summarize(tot.detect = n()) %>%
-  left_join(distinct(secor.sb[, c(5:7, 14)]))
+  left_join(distinct(secor.sb[, c(5:7, 15)]))
 
 # Attach date/place where the fish were tagged (i.e., their first observation)
 anim.data <- rbind(anim.data,
@@ -43,7 +43,7 @@ map <- openmap(c(42.95, -77.5), c(36.5, -69), type = 'mapquest-aerial')
 map <- autoplot.OpenStreetMap(openproj(map))
 
 dates <- seq(as.Date('2014-03-30'),
-             as.Date('2015-04-01'), by = 'day')
+             as.Date('2015-05-01'), by = 'day')
 
 map2 <- openmap(c(39.356, -77.371), c(37.897, -75.626),
                 type = 'mapquest-aerial')
