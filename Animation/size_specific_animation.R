@@ -1,11 +1,12 @@
 library(ggplot2); library(raster); library(animation); library(dplyr)
 load('secor.sb.rda')
 
-secor.sb <- secor.sb %>%
-  mutate(date.floor = lubridate::floor_date(date.local, unit = 'day'),
-         length.bin = ifelse(length < 550, '<55',
-                      ifelse(length >= 550 & length < 650, '55-65',
-                      ifelse(length >= 650 & length < 800, '65-80', '>80'))))
+secor.sb$date.floor <- lubridate::floor_date(secor.sb$date.local, unit = 'day')
+secor.sb$length.bin <- ifelse(secor.sb$length < 550, '<55',
+                      ifelse(secor.sb$length >= 550 &
+                               secor.sb$length < 650, '55-65',
+                      ifelse(secor.sb$length >= 650 &
+                               secor.sb$length < 800, '65-80', '>80')))
 
 anim.data <- secor.sb %>%
   group_by(trans.num, station, date.floor) %>%
@@ -43,7 +44,7 @@ map <- openmap(c(42.95, -77.5), c(36.5, -69), type = 'mapquest-aerial')
 map <- autoplot.OpenStreetMap(openproj(map))
 
 dates <- seq(as.Date('2014-03-30'),
-             as.Date('2015-05-01'), by = 'day')
+             as.Date('2015-07-01'), by = 'day')
 
 map2 <- openmap(c(39.356, -77.371), c(37.897, -75.626),
                 type = 'mapquest-aerial')
