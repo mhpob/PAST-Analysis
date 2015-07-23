@@ -51,9 +51,10 @@ secor.sb$array <-
                secor.sb$station == 'Report4', 'Long Island',
       ifelse(arr('dmf|vine|cz|ph|nera|plum|joppa|^er|ca\\d|nau|chat|mono|cove'),
              'Mass',
-      ifelse(arr('B1|CBB|LC|ts\\d|\\dch') |
-               secor.sb$station %in% c('CC LS', 'CH', 'NCD'), 'Bay Mouth',
-             'Other'))))))))))))))))))))
+      ifelse(arr('^b\\d|CBB|LC|ts\\d|henry') |
+               secor.sb$station %in% c('CC LS', 'CH'), 'Bay Mouth',
+      ifelse(arr('cb\\d|cb$|nc|ri\\d|ri$'), 'VA Coast',
+             'Other')))))))))))))))))))))
 
 tag.data <- read.csv('p:/obrien/biotelemetry/striped bass/taggingdata.csv',
                      stringsAsFactors = F)
