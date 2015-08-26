@@ -43,14 +43,14 @@ secor.sb <- secor.sb %>%
 
 pot.cols <- colorRampPalette(c('lightgreen', 'darkgreen'))(3)
 bay.cols <- colorRampPalette(c('red', 'orange'))(2)
-else.cols <- colorRampPalette(c('blue', 'violet'))(6)
+else.cols <- colorRampPalette(c('blue', 'violet'))(7)
 
 cols <- c('Upper Potomac' = pot.cols[1], 'Mid Potomac' = pot.cols[2],
           'Lower Potomac' = pot.cols[3], 'Maryland' = bay.cols[1],
           'Virginia' = bay.cols[2], 'C&D' = else.cols[1],
           'Delaware' = else.cols[2], 'DE Coast' = else.cols[3],
           'Mass' = else.cols[4], 'NY Bight' = else.cols[5],
-          'MD Coast' = else.cols[6])
+          'MD Coast' = else.cols[6], 'VA Coast' = else.cols[7])
 
 labels <- secor.sb %>% 
   distinct(trans.num, length) %>% 
@@ -62,8 +62,9 @@ ggplot() + geom_raster(data = secor.sb,
                        aes(x = date.floor, y = as.factor(plot.order),
                            fill = system)) +
   labs(x = 'Date', y = 'Length (mm)', fill = 'System') +
-  xlim(lubridate::ymd('2014-04-12'), lubridate::ymd('2015-04-30')) +
+  xlim(lubridate::ymd('2014-04-12'), lubridate::ymd('2015-07-31')) +
   scale_fill_manual(values = cols, breaks = c('Upper Potomac', 'Mid Potomac',
-                    'Lower Potomac', 'Maryland', 'Virginia', 'MD Coast', 'C&D',
-                    'Delaware', 'DE Coast', 'NY Bight', 'Mass')) +
+                    'Lower Potomac', 'Maryland', 'Virginia', 'VA Coast',
+                    'MD Coast', 'C&D', 'Delaware', 'DE Coast', 'NY Bight',
+                    'Mass')) +
   scale_y_discrete(labels = labels)
