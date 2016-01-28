@@ -15,6 +15,11 @@ secor.sb <- secor.sb %>%
 
 row.names(secor.sb) <- secor.sb[, 1]
 secor.sb <- secor.sb[, c(3, 2)]
+secor.sb <- SpatialPoints(secor.sb, CRS('+proj=longlat'))
+
+secor.sb <- spTransform(secor.sb,
+                         CRS('+proj=utm +zone=18 +datum=NAD83 +units=m'))
+secor.sb <- secor.sb@coords
 
 rm(trans)
 
