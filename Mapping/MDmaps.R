@@ -1,5 +1,5 @@
 library(raster); library(ggplot2); library(dplyr)
-midstates <- shapefile('p:/obrien/gis/shapefiles/midatlantic/matl_states_land.shp')
+midstates <- shapefile('c:/users/secor lab/desktop/gis products/chesapeake/midatlantic/matl_states_land.shp')
 pot <- midstates[midstates$STATE_ABBR %in% c('MD', 'VA', 'DC', 'DE'),]
 
 pot <- fortify(pot)
@@ -101,8 +101,10 @@ ggplot() + geom_polygon(data = pot, fill = 'darkgrey', color = 'black',
 
 
 ## Whole Bay
-cbrecs <- secor.sb %>% filter(secor.sb$array %in% c('C&D', 'CBIBS', 'Elizabeth',
-                  'Elk', 'James', 'Navy', 'Rappahannock', 'York')) %>% 
+cbrecs <- secor.sb %>% filter(secor.sb$array %in% c('Bay Mouth', 'C&D',
+            'Choptank', 'Elizabeth', 'James', 'Lower MD Bay', 'Lower Potomac',
+            'MD Coast', 'Mid MD Bay', 'Mid Potomac', 'Patuxent', 'Rappahannock',
+            'Upper MD Bay', 'Upper Potomac', 'York')) %>% 
   data.frame()
 arr <- function(part){grepl(part, cbrecs[, 'station'], ignore.case = T)}
 
