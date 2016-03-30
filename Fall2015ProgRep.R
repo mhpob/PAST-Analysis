@@ -67,15 +67,18 @@ ggplot() + geom_polygon(data = pot, fill = 'darkgrey', color = 'black',
 
 # How many detections were returned to us through ACT?
 returns <- secor.sb %>% 
-  filter(!grepl('Piney|Cedar|CBL|Kent|C&D|V-|T-|A-', station))
+  filter(!grepl('Rt|Piney|Cedar|CBL|Kent|C&D|V-|T-|A-', station))
 
 # Species, investigators, etc.
 library(TelemetryR); library(dplyr)
 dets <- vemsort('p:/obrien/biotelemetry/detections')
 dets <- dets %>% 
   filter(!grepl('Choptank|Pocomoke|Nanticoke|Marshyhope', station))
+asmfc_dets <- filter(dets, grepl('Rt|Piney|Cedar', station))
 
-species <- left_join(dets, ACTtrans, by = c('transmitter' = 'Tag.ID.Code.Standard'))
+load('p:/obrien/randomr/ACTactive.rda')
+species <- left_join(data.frame(asmfc_dets), ACTactive,
+                     by = c('transmitter' = 'Tag.ID.Code.Standard'))
 
 n_spec <- species %>% group_by(Common.Name, Primary.Researcher) %>% 
   distinct(transmitter) %>% 
