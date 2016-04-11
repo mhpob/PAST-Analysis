@@ -50,7 +50,7 @@ secor.sb$array <-
       ifelse(arr('fire|inlet \\d|jones|montauk|rockaway|shinnecock|swg|thames') |
                secor.sb$station == 'Report4', 'Long Island',
       ifelse(arr('dmf|vine|cz|ph|nera|plum|joppa|^er|ca\\d|nau|chat|mono|cove|
-                 |bb\\d|bh\\d|ccc|vs'),
+                 |elli| inl|orl|sci|jer|bb\\d|bh\\d|ccc|vs'),
              'Mass',
       ifelse(arr('^b\\d|CBB|LC|ts\\d|henry') |
                secor.sb$station %in% c('CC LS', 'CH'), 'Bay Mouth',
