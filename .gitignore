@@ -10,14 +10,15 @@ Thumbs.db
 .Rproj.user/
 .Rproj.user
 # Striped bass data
-secor.sb.rda
-sb.speed.rda
-distances.csv
-modelparams.xlsx
+*.rda
+*.csv
+*.xlsx
 # Distance calculation files
 .httr-oauth
 ras_water*
-# Animations and music
+# Multimedia
 *.avi
+*.emf
 *.mp3
 *.mp4
+*.jpeg
