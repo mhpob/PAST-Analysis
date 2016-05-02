@@ -37,9 +37,9 @@ secor.sb$array <-
       ifelse(arr('cedar|goose'), 'Lower MD Bay',
       ifelse(arr('elk|pata') | secor.sb$station == 'Report5', 'Upper MD Bay',
       ifelse(arr('&| 32'), 'C&D',
-      ifelse(arr('rapp'), 'Rappahannock',
+      ifelse(arr('rapp|sting'), 'Rappahannock',
       ifelse(arr('vims|^y'), 'York',
-      ifelse(arr('^nn|r\\d\\d|bur|g\\d|poco|^hi') |
+      ifelse(arr('^nn|r\\d\\d|bur|g\\d|poco|^hi|james') |
                secor.sb$station %in% c('NH8', 'NH10'), 'James',
       ifelse(secor.sb$station %in% c('APM1',
                                      paste0('NH', 12:35)), 'Elizabeth',
