@@ -37,9 +37,9 @@ t2 <- count(t2, from, to)
 
 library(circlize)
 chordDiagram(t2, directional = 1, self.link = 1,
-             order = c('Potomac', 'MD Bay', 'Patuxent', 'James', 'Bay Mouth',
-                       'MD Coast', 'DE Coast', 'New Jersey', 'Long Island',
-                       'Mass'))
+             order = c('Potomac', 'MD Bay', 'Patuxent', 'Rappahannock', 'James',
+                       'Bay Mouth', 'MD Coast', 'DE Coast', 'New Jersey',
+                       'Long Island', 'Mass'))
                # order = c('Mid Potomac', 'Lower Potomac', 'Lower MD Bay',
                #           'Patuxent', 'Mid MD Bay', 'Upper MD Bay', 'James',
                #           'Bay Mouth', 'MD Coast', 'DE Coast', 'New Jersey',
