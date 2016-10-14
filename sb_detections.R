@@ -14,7 +14,8 @@ false.pos <- c("A69-1303-15268", "A69-1303-21996", "A69-1303-55828",
 detects <- vemsort('p:/obrien/biotelemetry/detections', false.pos)
 
 secor.sb <- detects %>% 
-  filter(trans.num >= 25434 & trans.num <= 25533) %>%
+  filter(trans.num >= 25434 & trans.num <= 25533 |
+         trans.num >= 53850 & trans.num <= 53899) %>%
   select(-one_of('trans.name', 'trans.serial', 'sensor.value',
                  'sensor.unit')) %>% 
   data.frame()
@@ -29,8 +30,9 @@ secor.sb$array <-
                   'Roosevelt Br.', 'S. Capitol Br.', 'S. Craney Isl.', 'Report2',
                   'Report8'),
              'Upper Potomac',
-      ifelse(arr('cbl|jacks|pax|nott') | secor.sb$station %in% c('Benedicts Bridge',
-                  'Broomes', 'Magruders', 'Pepco', 'SERC Active'), 'Patuxent',
+      ifelse(arr('cbl|jacks|pax|nott|jug') |
+               secor.sb$station %in% c('Benedicts Bridge', 'Broomes',
+                   'Magruders', 'Pepco', 'SERC Active'), 'Patuxent',
       ifelse(arr('chop'), 'Choptank',
       ifelse(arr('kent|annap|dock|rho') | secor.sb$station %in% c('Report3',
                                     'Report7', 'Report9'), 'Mid MD Bay',
@@ -55,7 +57,8 @@ secor.sb$array <-
              'Mass',
       ifelse(arr('^b\\d|CBB|LC|ts\\d|henry') |
                secor.sb$station %in% c('CC LS', 'CH'), 'Bay Mouth',
-      ifelse(arr('cb\\d|cb$|nc|ri\\d|ri$'), 'VA Coast',
+      ifelse(arr('cb\\d|cb$|nc|ri\\d|ri$|scl|wea') |
+               secor.sb$station %in% c('RA', 'RAOutside'), 'VA Coast',
              'Other'))))))))))))))))))))))
 
 tag.data <- read.csv('p:/obrien/biotelemetry/striped bass/taggingdata.csv',
