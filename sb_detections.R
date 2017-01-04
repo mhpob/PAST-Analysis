@@ -61,7 +61,7 @@ secor.sb$array <-
                secor.sb$station %in% c('RA', 'RAOutside'), 'VA Coast',
              'Other'))))))))))))))))))))))
 
-tag.data <- read.csv('p:/obrien/biotelemetry/striped bass/taggingdata.csv',
+tag.data <- read.csv('p:/obrien/biotelemetry/PAST SB/taggingdata.csv',
                      stringsAsFactors = F)
 tag.data$Date <- mdy(tag.data$Date, tz = 'America/New_York')
 tag.data <- tag.data[, c(1, 2, 5, 7, 8)]
