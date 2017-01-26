@@ -1,21 +1,10 @@
 library(TelemetryR); library(lubridate); library(dplyr)
 
-# False detections as determined by VEMCO
-false.pos <- c("A69-1303-15268", "A69-1303-21996", "A69-1303-55828",
-               "A69-1601-10197", "A69-1601-13358", "A69-1601-14295",
-               "A69-1601-18147", "A69-1601-20794", "A69-1601-21435",
-               "A69-1601-25631", "A69-1601-27179", "A69-1601-31594",
-               "A69-1601-37119", "A69-1601-41805", "A69-1601-43030",
-               "A69-1601-43368", "A69-1601-43862", "A69-1601-60533",
-               "A69-1601-64288", "A69-1601-9185", "A69-1602-22686",
-               "A69-1602-23019", "A69-1602-46762", "A69-1602-54302",
-               "A69-1602-64173", "A69-1602-64407", "A69-9001-26563",
-               "A69-9001-65126")
-detects <- vemsort('p:/obrien/biotelemetry/detections', false.pos)
+detects <- vemsort('p:/obrien/biotelemetry/detections')
 
 secor.sb <- detects %>% 
-  filter(trans.num >= 25434 & trans.num <= 25533 |
-         trans.num >= 53850 & trans.num <= 53899) %>%
+  filter(transmitter %in% paste0('A69-1601-', seq(25434, 25533, 1)) |
+         transmitter %in% paste0('A69-1601-', seq(53850, 53899, 1))) %>%
   select(-one_of('trans.name', 'trans.serial', 'sensor.value',
                 'sensor.unit')) %>% 
   data.frame()
@@ -52,45 +41,45 @@ secor.sb$array <-
       ifelse(arr('elk|pata') | secor.sb$station == 'Report5', 'Upper MD Bay',
       ifelse(arr('&| 32'), 'C&D',
       ifelse(arr('marsh|nan'), 'Nanticoke',
-      ifelse(arr('rapp|sting|cr'), 'Rappahannock',
+      ifelse(arr('rapp|sting|cr '), 'Rappahannock',
       ifelse(arr('vims|^y'), 'York',
-      ifelse(arr('^nn|r\\d\\d|bur|g\\d|poco|^hi|james') |
+      ifelse(arr('^nn|(g|^r)\\d|bur| poco|^hi|james') |
                secor.sb$station %in% c('NH8', 'NH10'), 'James',
       ifelse(secor.sb$station %in% c('APM1',
                                      paste0('NH', 12:35)), 'Elizabeth',
-      ifelse(arr('v-|t-|a-'), 'MD Coast',
+      ifelse(arr('v-|t-|a-|cs-|inner|outer|middle'), 'MD Coast',
       ifelse(arr('# 2|# 3'), 'Delaware',
       ifelse(arr('# 1'), 'DE Coast',
-      ifelse(arr('sandy|barnegat|shark'), 'New Jersey',
+      ifelse(arr('sandy|barnegat|shark river'), 'New Jersey',
+      ifelse(secor.sb$station == 'Storm King', 'Hudson',
       ifelse(arr('fire|inlet \\d|jones|montauk|rockaway|shinnecock|swg|thames') |
                secor.sb$station == 'Report4', 'Long Island',
-      ifelse(arr('dmf|vine|cz|ph|nera|plum|joppa|^er|ca\\d|nau|chat|mono|cove|
-                 |elli| inl|orl|sci|jer|bb\\d|bh\\d|ccc|vs'),
+      ifelse(arr('dmf|vine|cz|ph|nera|plum|joppa|^er|(ca|bb|bh)\\d|nau|chat|
+                 |mono|cove|elli| inl|orl|sci|jer|ccc|vs'),
              'Mass',
-      ifelse(arr('^b\\d|CBB|LC|ts\\d|henry') |
-               secor.sb$station %in% c('CC LS', 'CH'), 'Bay Mouth',
-      ifelse(arr('cb\\d|cb$|nc|ri\\d|ri$|scl|wea') |
-               secor.sb$station %in% c('RA', 'RAOutside'), 'VA Coast',
-             'Other'))))))))))))))))))))))
+      ifelse(arr('(^b|ts)\\d|CBB|LC|henry|cc ls|\\dch|^ch$'),'Bay Mouth',
+      ifelse(arr('(cb|ri)($|\\d)|^nc|^(ra$|rao)|scl|wea'), 'VA Coast',
+             'Other')))))))))))))))))))))))
 
 tag.data <- read.csv('p:/obrien/biotelemetry/PAST SB/taggingdata.csv',
                      stringsAsFactors = F)
 tag.data$Date <- mdy(tag.data$Date, tz = 'America/New_York')
-tag.data <- tag.data[, c(1, 2, 5, 7, 8)]
-names(tag.data) <- c('tag.date', 'trans.num', 'length', 'weight', 'sex')
+tag.data <- tag.data[, c('Date', 'Tag.ID', 'Length..TL..mm.',
+                         'Weight..kg.', 'Sex')]
+names(tag.data) <- c('tag.date', 'transmitter', 'length', 'weight', 'sex')
 
 # we reused tag A69-1601-25465 on 2014-10-30. Need to split tagging data to
 # reflect this.
 firsttagging.25465 <- secor.sb %>% 
-  filter(trans.num == 25465, date.utc <= '2014-06-15') %>%
+  filter(transmitter == 'A69-1601-25465', date.utc <= '2014-06-15') %>%
   merge(tag.data[32,], all.x = T)
 
 secondtagging.25465 <- secor.sb %>% 
-  filter(trans.num == 25465, date.utc >= '2014-10-29') %>%
+  filter(transmitter == 'A69-1601-25465', date.utc >= '2014-10-29') %>%
   merge(tag.data[101,], all.x = T)
 
 secor.sb <- secor.sb %>% 
-  filter(trans.num != 25465) %>% 
+  filter(transmitter != 'A69-1601-25465') %>% 
   merge(tag.data, all.x = T) %>%
   rbind(firsttagging.25465, secondtagging.25465) %>%
   tbl_df()
