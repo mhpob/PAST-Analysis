@@ -3,8 +3,8 @@ library(TelemetryR); library(lubridate); library(dplyr)
 detects <- vemsort('p:/obrien/biotelemetry/detections')
 
 secor.sb <- detects %>% 
-  filter(trans.num >= 25434 & trans.num <= 25533 |
-         trans.num >= 53850 & trans.num <= 53899) %>%
+  filter(transmitter %in% paste0('A69-1601-', seq(25434, 25533, 1)) |
+         transmitter %in% paste0('A69-1601-', seq(53850, 53899, 1))) %>%
   select(-one_of('trans.name', 'trans.serial', 'sensor.value',
                  'sensor.unit')) %>% 
   data.frame()
@@ -52,21 +52,22 @@ secor.sb$array <-
 tag.data <- read.csv('p:/obrien/biotelemetry/PAST SB/taggingdata.csv',
                      stringsAsFactors = F)
 tag.data$Date <- mdy(tag.data$Date, tz = 'America/New_York')
-tag.data <- tag.data[, c(1, 2, 5, 7, 8)]
-names(tag.data) <- c('tag.date', 'trans.num', 'length', 'weight', 'sex')
+tag.data <- tag.data[, c('Date', 'Tag.ID', 'Length..TL..mm.',
+                         'Weight..kg.', 'Sex')]
+names(tag.data) <- c('tag.date', 'transmitter', 'length', 'weight', 'sex')
 
 # we reused tag A69-1601-25465 on 2014-10-30. Need to split tagging data to
 # reflect this.
 firsttagging.25465 <- secor.sb %>% 
-  filter(trans.num == 25465, date.utc <= '2014-06-15') %>%
+  filter(transmitter == 'A69-1601-25465', date.utc <= '2014-06-15') %>%
   merge(tag.data[32,], all.x = T)
 
 secondtagging.25465 <- secor.sb %>% 
-  filter(trans.num == 25465, date.utc >= '2014-10-29') %>%
+  filter(transmitter == 'A69-1601-25465', date.utc >= '2014-10-29') %>%
   merge(tag.data[101,], all.x = T)
 
 secor.sb <- secor.sb %>% 
-  filter(trans.num != 25465) %>% 
+  filter(transmitter != 'A69-1601-25465') %>% 
   merge(tag.data, all.x = T) %>%
   rbind(firsttagging.25465, secondtagging.25465) %>%
   tbl_df()
