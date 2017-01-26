@@ -40,26 +40,25 @@ secor.sb$array <-
       ifelse(arr('elk|pata') | secor.sb$station == 'Report5', 'Upper MD Bay',
       ifelse(arr('&| 32'), 'C&D',
       ifelse(arr('marsh|nan'), 'Nanticoke',
-      ifelse(arr('rapp|sting|cr'), 'Rappahannock',
+      ifelse(arr('rapp|sting|cr '), 'Rappahannock',
       ifelse(arr('vims|^y'), 'York',
-      ifelse(arr('^nn|r\\d\\d|bur|g\\d|poco|^hi|james') |
+      ifelse(arr('^nn|(g|^r)\\d|bur| poco|^hi|james') |
                secor.sb$station %in% c('NH8', 'NH10'), 'James',
       ifelse(secor.sb$station %in% c('APM1',
                                      paste0('NH', 12:35)), 'Elizabeth',
-      ifelse(arr('v-|t-|a-'), 'MD Coast',
+      ifelse(arr('v-|t-|a-|cs-|inner|outer|middle'), 'MD Coast',
       ifelse(arr('# 2|# 3'), 'Delaware',
       ifelse(arr('# 1'), 'DE Coast',
-      ifelse(arr('sandy|barnegat|shark'), 'New Jersey',
+      ifelse(arr('sandy|barnegat|shark river'), 'New Jersey',
+      ifelse(secor.sb$station == 'Storm King', 'Hudson',
       ifelse(arr('fire|inlet \\d|jones|montauk|rockaway|shinnecock|swg|thames') |
                secor.sb$station == 'Report4', 'Long Island',
-      ifelse(arr('dmf|vine|cz|ph|nera|plum|joppa|^er|ca\\d|nau|chat|mono|cove|
-                 |elli| inl|orl|sci|jer|bb\\d|bh\\d|ccc|vs'),
+      ifelse(arr('dmf|vine|cz|ph|nera|plum|joppa|^er|(ca|bb|bh)\\d|nau|chat|
+                 |mono|cove|elli| inl|orl|sci|jer|ccc|vs'),
              'Mass',
-      ifelse(arr('^b\\d|CBB|LC|ts\\d|henry') |
-               secor.sb$station %in% c('CC LS', 'CH'), 'Bay Mouth',
-      ifelse(arr('cb\\d|cb$|nc|ri\\d|ri$|scl|wea') |
-               secor.sb$station %in% c('RA', 'RAOutside'), 'VA Coast',
-             'Other'))))))))))))))))))))))
+      ifelse(arr('(^b|ts)\\d|CBB|LC|henry|cc ls|\\dch|^ch$'),'Bay Mouth',
+      ifelse(arr('(cb|ri)($|\\d)|^nc|^(ra$|rao)|scl|wea'), 'VA Coast',
+             'Other')))))))))))))))))))))))
 
 tag.data <- read.csv('p:/obrien/biotelemetry/PAST SB/taggingdata.csv',
                      stringsAsFactors = F)
