@@ -65,8 +65,9 @@ tag.data <- read.csv('p:/obrien/biotelemetry/PAST SB/taggingdata.csv',
                      stringsAsFactors = F)
 tag.data$Date <- mdy(tag.data$Date, tz = 'America/New_York')
 tag.data <- tag.data[, c('Date', 'Tag.ID', 'Length..TL..mm.',
-                         'Weight..kg.', 'Sex')]
-names(tag.data) <- c('tag.date', 'transmitter', 'length', 'weight', 'sex')
+                         'Weight..kg.', 'Sex', 'Age.Scale')]
+names(tag.data) <- c('tag.date', 'transmitter', 'length',
+                     'weight', 'sex', 'age')
 
 # we reused tag A69-1601-25465 on 2014-10-30. Need to split tagging data to
 # reflect this.
