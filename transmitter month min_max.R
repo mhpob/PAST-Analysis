@@ -29,8 +29,26 @@ secor.sb$factor_transmitter <- factor(secor.sb$transmitter)
 class(secor.sb$date.local)
 ?month
 ?year
-lapply(secor.sb$date.utc, min)
-lapply(secor.sb$date.utc, max)
+
+secor.sb_date_min<-lapply(secor.sb$date.utc, min)
+secor.sb_date_max<-lapply(secor.sb$date.utc, max)
+
+secor.sb_date_max
+secor.sb_date_min
+
 
 # 2) substract lists?
+
+#secor.sb_date_mid<-mapply('-', secor.sb_date_max, secor.sb_date_min, SIMPLIFY=FALSE)
+#secor.sb_date_mid<-diff(secor.sb_date_max,secor.sb_date_min)
+#secor.sb_date_mid<-lapply(diff(secor.sb_date_max, secor.sb_date_min))
+
+#min and max are presented as numbers of seconds or still "dates"? how to convert?
+
+
+
+v.secor.sb_date_max <- c(secor.sb_date_max)
+v.secor.sb_date_min <- c(secor.sb.date_min)
+
+v.secor.sb_date_mid <- diff(v.secor.sb_date_max, v.secor.sb_date_min)
 
