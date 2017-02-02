@@ -2,34 +2,55 @@ library(TelemetryR); library(lubridate); library(dplyr)
 
 load('secor.sb.rda')
 
-# Group transmitters w/in data frame, then find first and last detections
-secor.sb <- group_by(secor.sb, transmitter)
+# Group transmitters by cohort tagged, then find first and last detections
+spring.tag <- filter(secor.sb, tag.date < '2014-10-30') %>% 
+  group_by(transmitter)
+fall.tag <- filter(secor.sb, tag.date == '2014-10-30') %>% 
+  group_by(transmitter)
 
-secor.sb <- summarize(secor.sb,
-                  low = min(date.local),
-                  high = max(date.local))
+hi_lo <- function(data){
+  summarize(data,
+            low = min(date.local),
+            high = max(date.local))
+}
 
 # Histogram
-hist(secor.sb$high,
-     breaks = seq(from = ymd_hms('2014-03-30 00:00:00',
-                                 tz = 'America/New_York'),
-                  to = max(secor.sb$high) + months(1),
+final_detect_hist <- function(data){
+  new.data <- hi_lo(data)
+  
+  hist(new.data$high,
+     breaks = seq(from = min(new.data$high),
+                  to = max(new.data$high) + months(1),
                   by = 'months'),
-     col="green")
+     col="green",
+     main = deparse(substitute(data)),
+     xlab = 'Date')
+}
+
+final_detect_hist(spring.tag)
+final_detect_hist(fall.tag)
 
 # Cumulative frequency
-#   Note: no built-in function, so I'm going to cheat and use a built-in
-#   function from the ggplot2 package
 library(ggplot2)
-CF_plot <- ggplot() + stat_ecdf(data = secor.sb, aes(x = high)) +
-  scale_x_datetime(date_breaks = '3 months')
-CF_plot
+final_detect_cf <- function(data, pct.stop){
+  new.data <- hi_lo(data)
+  
+  #   Note: no built-in function, so I'm going to cheat and use a built-in
+  #   function from the ggplot2 package
+  CF_plot <- ggplot() + stat_ecdf(data = new.data, aes(x = high)) +
+    scale_x_datetime(date_breaks = '3 months')
+  print(CF_plot)
+  
+  #   Pull data from the plot. Dates are returned in Unix (seconds since
+  #   Jan 1, 1970), so we need to convert back to a usable time.
+  CF_data <- data.frame(ggplot_build(CF_plot)$data)
+  CF_data$date.local <- as_datetime(CF_data$x, tz = 'America/New_York')
+  
+  #   Find date where X% of tags stopped transmitting
+  stopped <- min(CF_data[CF_data$date.local >= pct.stop, 'date.local'])
+  cat((as.numeric(pct.stop) * 100), '% of last detections occurred before',
+  as.character(stopped))
+}
 
-#   Pull data from the plot. Dates are returned in Unix (seconds since
-#   Jan 1, 1970), so we need to convert back to a usable time.
-CF_data <- data.frame(ggplot_build(CF_plot)$data)
-CF_data$date.local <- as_datetime(CF_data$x, tz = 'America/New_York')
-
-#   Find date where 90% of tags stopped transmitting
-min(CF_data[CF_data$y >= 0.9, 'date.local'])
-
+final_detect_cf(spring.tag, 0.9)
+final_detect_cf(fall.tag, 0.75)
