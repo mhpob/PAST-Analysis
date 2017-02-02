@@ -6,20 +6,8 @@ secor.sb <- detects %>%
   filter(transmitter %in% paste0('A69-1601-', seq(25434, 25533, 1)) |
          transmitter %in% paste0('A69-1601-', seq(53850, 53899, 1))) %>%
   select(-one_of('trans.name', 'trans.serial', 'sensor.value',
-                'sensor.unit')) %>% 
+                 'sensor.unit')) %>% 
   data.frame()
-
-
-#detects <- vemsort('p:/obrien/biotelemetry/detections', false.pos)
-
-#seq1 <- seq(25434, 25533, 1)
-#seq2 <- seq(53850, 53899, 1)
-
-#secor.sb <- detects %>%
-#  paste("A69-1601",seq1:seq2,sep="-") 
-
-#data.frame()
-
 
 arr <- function(part){grepl(part, secor.sb[, 'station'], ignore.case = T)}
   
@@ -85,6 +73,4 @@ secor.sb <- secor.sb %>%
   rbind(firsttagging.25465, secondtagging.25465) %>%
   tbl_df()
 
-
 save(secor.sb, file = 'secor.sb.rda')
-
