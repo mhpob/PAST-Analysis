@@ -1,6 +1,7 @@
 library(lubridate); library(ggplot2); library(dplyr)
 load('secor.sb.rda')
 
+# Data prep ----
 # Select fish that lived long enough, flag those that didn't make it through
 #   2015 season (mutate line)
 valid.fish <- secor.sb %>% 
@@ -10,7 +11,6 @@ valid.fish <- secor.sb %>%
   filter(max >= '2015-03-31') %>% 
   mutate(yr.flag = ifelse(max <= '2016-03-31', 2014, 2015))
 
-# Prepare data
 occ.data <- secor.sb %>% 
   left_join(valid.fish) %>% 
   # Use flag to remove observations if fish didn't make it through year
@@ -41,31 +41,53 @@ occ.data <- left_join(occ.data, pct.coastal) %>%
   distinct(tag.season, transmitter, year, coastal,
            pct.coastal, age.adjust, length)
 
-# Begin model. No fall fish were coastal, so only do analysis on spring.
-#   Run coastal ~ age + random(fish)
+#   Run coastal ~ age + random(fish) for age
 #   Run years separately for length, shouldn't need random transmitter effect
 rm(pct.coastal, secor.sb, valid.fish)
 spring <- filter(occ.data, tag.season == 'Spring')
 sp.2014 <- filter(spring, year == 2014)
 sp.2015 <- filter(spring, year == 2015)
 
-#   Age
+# Coastal incidence v age modeling ----
 library(lme4)
-spr.age <- glmer(coastal ~ age.adjust + (1 | transmitter),
-                 family = 'binomial',
-                 data = spring)
-# Likelihood way to run glmm
-# library(ez)
-spr.age.likeli <- ezMixed(data = spring,
-                          dv = .(coastal),
-                          fixed = .(age.adjust),
-                          random = .(transmitter),
-                          family = 'binomial')
+glm_incidence <- glmer(coastal ~ age.adjust + (1 | transmitter),
+                       family = 'binomial',
+                       data = spring)
 
-#   Length
-sp.2014 <- glm(coastal ~ length,
-               data = sp.2014,
-               family = 'binomial')
-sp.2015 <- glm(coastal ~ length,
-               data = sp.2015,
-               family = 'binomial')
+# Likelihood glmm
+# library(ez)
+# glm_incidence_ML <- ezMixed(data = spring,
+#                            dv = .(coastal),
+#                            fixed = .(age.adjust),
+#                            random = .(transmitter),
+#                            family = 'binomial')
+
+# Coastal incidence v length modeling ----
+glm_incidence14 <- glm(coastal ~ length,
+                       data = sp.2014,
+                       family = 'binomial')
+glm_incidence15 <- glm(coastal ~ length,
+                       data = sp.2015,
+                       family = 'binomial')
+
+# % Mmonths coastal v age ----
+library(lme4)
+glm_PctCoast <- glmer(pct.coastal ~ age.adjust + (1 | transmitter),
+                      family = 'binomial',
+                      data = spring)
+
+# Likelihood glmm
+# library(ez)
+# glm_PctCoast_ML <- ezMixed(data = spring,
+#                            dv = .(pct.coastal),
+#                            fixed = .(age.adjust),
+#                            random = .(transmitter),
+#                            family = 'binomial')
+
+# % Months coastal v length modeling ----
+glm_PctCoast14 <- glm(pct.coastal ~ length,
+                       data = sp.2014,
+                       family = 'binomial')
+glm_PctCoast15 <- glm(pct.coastal ~ length,
+                       data = sp.2015,
+                       family = 'binomial')
