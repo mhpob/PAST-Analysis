@@ -1,6 +1,8 @@
 library(lubridate); library(ggplot2); library(dplyr)
 load('secor.sb.rda')
 
+# Goal is to calculate % success of Navy array in detecting fish that went into
+# coastal waters.
 eff.base <- secor.sb %>% 
   mutate(yr.adjust = ifelse(date.local <= '2015-03-21', 2014,
                             ifelse(date.local > '2015-03-21' &
@@ -11,28 +13,25 @@ eff.base <- secor.sb %>%
                                        'New Jersey'), T, F),
          mouth = ifelse(array == 'Bay Mouth', T, F),
          month = month(date.local),
-         mouth.season = ifelse(month %in% seq(4, 6, 1), 'Spring',
-                               ifelse(month %in% c(11, 12, 1),'Fall',
-                                      'Other'))) 
-
-overall.eff <- eff.base %>% 
+         mouth.season = ifelse(month %in% 1:3, 'Jan-Mar',
+                        ifelse(month %in% 4:6, 'Apr-Jun',
+                        ifelse(month %in% 7:9, 'Jul-Sep',
+                                               'Oct-Dec')))) %>% 
   group_by(transmitter, yr.adjust) %>% 
-  filter(T %in% coastal) %>%
+  filter(T %in% coastal)
+
+overall.eff <- eff.base %>%
   summarize(navy.detected = T %in% mouth) %>% 
   ungroup() %>% 
   summarize(overall.eff = sum(navy.detected == T)/n())
   
 yr.eff <- eff.base %>% 
-  group_by(transmitter, yr.adjust) %>% 
-  filter(T %in% coastal) %>%
   summarize(navy.detected = T %in% mouth) %>% 
   group_by(yr.adjust) %>% 
   summarize(yr.eff = sum(navy.detected == T)/n())
 
-season.eff <- eff.base %>% group_by(transmitter, yr.adjust) %>% 
-  filter(T %in% coastal) %>%
+season.eff <- eff.base %>%
   group_by(transmitter, yr.adjust, mouth.season) %>% 
   summarize(navy.detected = T %in% mouth) %>% 
-  group_by(yr.adjust, mouth.season) %>% 
+  group_by(mouth.season, yr.adjust) %>% 
   summarize(season.eff = sum(navy.detected == T)/n())
-
