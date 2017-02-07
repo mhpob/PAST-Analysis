@@ -46,7 +46,7 @@ secor.sb$array <-
                  |mono|cove|elli| inl|orl|sci|jer|ccc|vs'),
              'Mass',
       ifelse(arr('(^b|ts)\\d|CBB|LC|henry|cc ls|\\dch|^ch$'),'Bay Mouth',
-      ifelse(arr('(cb|ri)($|\\d)|^nc|^(ra$|rao)|scl|wea'), 'VA Coast',
+      ifelse(arr('(^cb|ri)($|\\d)|^nc|^(ra$|rao)|scl|wea'), 'VA Coast',
              'Other')))))))))))))))))))))))
 
 tag.data <- read.csv('p:/obrien/biotelemetry/PAST SB/taggingdata.csv',
