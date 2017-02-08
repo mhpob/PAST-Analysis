@@ -1,7 +1,7 @@
 library(ggplot2); library(lubridate); library(dplyr)
 load('secor.sb.rda')
 
-first.base <- secor.sb %>% 
+base.data <- secor.sb %>% 
   mutate(coastal = ifelse(array %in% c('VA Coast', 'MD Coast', 'DE Coast',
                                        'Hudson', 'Long Island', 'Mass',
                                        'New Jersey'), T, F),
@@ -15,7 +15,7 @@ first.base <- secor.sb %>%
          wk = floor_date(date.local, unit = 'week'))
 
 # First week of coastal incidence ----
-first.coast <- first.base %>% 
+first.coast <- base.data %>% 
   filter(coastal == T) %>% 
   group_by(transmitter, yr.adjust) %>% 
   summarize(c.firstnum = min(wk.num),
@@ -26,14 +26,14 @@ ggplot() + geom_histogram(data = first.coast, aes(c.firstnum)) +
 
 # First week of return to Chesapeake ---- 
 ## Double-check. I worked quickly here.
-first.return <- first.base %>% 
+first.return <- base.data %>% 
   group_by(transmitter, yr.adjust) %>% 
   filter(T %in% coastal) %>% 
   left_join(first.coast) %>% 
-  filter(date.local > c.firstwk,
+  filter(wk > c.firstwk,
          coastal == F) %>% 
   summarize(b.firstnum = min(wk.num),
             b.firstwk = min(wk))
 
-ggplot() + geom_histogram(data = first.return, aes(b.firstnum)) +
+ggplot() + geom_histogram(data = first.return, aes(b.firstnum), bins = 52) +
   facet_wrap(~ yr.adjust, ncol = 1)
