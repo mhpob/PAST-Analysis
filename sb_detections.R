@@ -39,7 +39,7 @@ secor.sb$array <-
       ifelse(arr('# 2|# 3'), 'Delaware',
       ifelse(arr('# 1'), 'DE Coast',
       ifelse(arr('sandy|barnegat|shark river'), 'New Jersey',
-      ifelse(secor.sb$station == 'Storm King', 'Hudson',
+      ifelse(arr('^light|storm'), 'Hudson',
       ifelse(arr('fire|inlet \\d|jones|montauk|rockaway|shinnecock|swg|thames') |
                secor.sb$station == 'Report4', 'Long Island',
       ifelse(arr('dmf|vine|cz|ph|nera|plum|joppa|^er|(ca|bb|bh)\\d|nau|chat|
