@@ -37,14 +37,10 @@ first.return <- base.data %>%
 ggplot() + geom_histogram(data = first.return, aes(b.firstnum), bins = 52) +
   facet_wrap(~ yr.adjust, ncol = 1)
 
-# First week above Rt 301 ---- keep working...
+# First week above Rt 301 ----
 left.pot <- base.data %>% 
-  group_by(transmitter, yr.adjust) %>% 
-  filter(!array %in% c('Upper Potomac', 'Mid Potomac', 'Lower Potomac')) %>%
-  summarize(left.pot = min(wk)) %>% 
-  left_join(base.data) %>% 
-  group_by(transmitter, yr.adjust) %>% 
-  filter(wk > left.pot,
+  filter(month(date.local) %in% 2:5,
+         # date.local > '2014-06-01',
          array %in% c('Upper Potomac', 'Mid Potomac')) %>% 
-  summarize(p.firstnum = min(wk.num),
-            p.firstwk = min(wk))
+  group_by(transmitter, year(date.local)) %>% 
+  summarize(test = min(wk))
