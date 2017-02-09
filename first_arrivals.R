@@ -24,8 +24,7 @@ first.coast <- base.data %>%
 ggplot() + geom_histogram(data = first.coast, aes(c.firstnum)) +
   facet_wrap(~ yr.adjust, ncol = 1)
 
-# First week of return to Chesapeake ---- 
-## Double-check. I worked quickly here.
+# First week of return to Chesapeake ----
 first.return <- base.data %>% 
   group_by(transmitter, yr.adjust) %>% 
   filter(T %in% coastal) %>% 
@@ -37,3 +36,15 @@ first.return <- base.data %>%
 
 ggplot() + geom_histogram(data = first.return, aes(b.firstnum), bins = 52) +
   facet_wrap(~ yr.adjust, ncol = 1)
+
+# First week above Rt 301 ---- keep working...
+left.pot <- base.data %>% 
+  group_by(transmitter, yr.adjust) %>% 
+  filter(!array %in% c('Upper Potomac', 'Mid Potomac', 'Lower Potomac')) %>%
+  summarize(left.pot = min(wk)) %>% 
+  left_join(base.data) %>% 
+  group_by(transmitter, yr.adjust) %>% 
+  filter(wk > left.pot,
+         array %in% c('Upper Potomac', 'Mid Potomac')) %>% 
+  summarize(p.firstnum = min(wk.num),
+            p.firstwk = min(wk))
