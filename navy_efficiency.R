@@ -22,19 +22,22 @@ overall.eff <- eff.base %>%
   ungroup() %>% 
   summarize(navy = sum(navy.detected == T),
             coastal = n(),
-            overall.eff = sum(navy.detected == T)/n())
+            overall.eff = navy/coastal)
   
 yr.eff <- eff.base %>% 
   summarize(navy.detected = T %in% mouth) %>% 
   group_by(yr.adjust) %>% 
   summarize(navy = sum(navy.detected == T),
             coastal = n(),
-            yr.eff = sum(navy.detected == T)/n())
+            yr.eff = navy/coastal)
 
 season.eff <- eff.base %>%
   group_by(transmitter, yr.adjust, mouth.season) %>% 
   summarize(navy.detected = T %in% mouth) %>% 
-  group_by(mouth.season, yr.adjust) %>% 
-  summarize(navy = sum(navy.detected == T),
-            coastal = n(),
-            season.eff = sum(navy.detected == T)/n())
+  group_by(yr.adjust, mouth.season) %>% 
+  summarize(navy = sum(navy.detected == T)) %>% 
+  left_join(yr.eff[, c(1,3)]) %>% 
+  group_by(yr.adjust, mouth.season) %>% 
+  summarize(navy = navy,
+            coastal = coastal,
+    season.eff = navy/coastal)
