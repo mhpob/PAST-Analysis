@@ -13,25 +13,28 @@ eff.base <- secor.sb %>%
                                        'New Jersey'), T, F),
          mouth = ifelse(array == 'Bay Mouth', T, F),
          month = month(date.local),
-         mouth.season = ifelse(month %in% 1:3, 'Jan-Mar',
-                        ifelse(month %in% 4:6, 'Apr-Jun',
-                        ifelse(month %in% 7:9, 'Jul-Sep',
-                                               'Oct-Dec')))) %>% 
+         mouth.season = ifelse(month %in% 4:9, 'Apr-Sep', 'Oct-Mar')) %>% 
   group_by(transmitter, yr.adjust) %>% 
   filter(T %in% coastal)
 
 overall.eff <- eff.base %>%
   summarize(navy.detected = T %in% mouth) %>% 
   ungroup() %>% 
-  summarize(overall.eff = sum(navy.detected == T)/n())
+  summarize(navy = sum(navy.detected == T),
+            coastal = n(),
+            overall.eff = sum(navy.detected == T)/n())
   
 yr.eff <- eff.base %>% 
   summarize(navy.detected = T %in% mouth) %>% 
   group_by(yr.adjust) %>% 
-  summarize(yr.eff = sum(navy.detected == T)/n())
+  summarize(navy = sum(navy.detected == T),
+            coastal = n(),
+            yr.eff = sum(navy.detected == T)/n())
 
 season.eff <- eff.base %>%
   group_by(transmitter, yr.adjust, mouth.season) %>% 
   summarize(navy.detected = T %in% mouth) %>% 
   group_by(mouth.season, yr.adjust) %>% 
-  summarize(season.eff = sum(navy.detected == T)/n())
+  summarize(navy = sum(navy.detected == T),
+            coastal = n(),
+            season.eff = sum(navy.detected == T)/n())
