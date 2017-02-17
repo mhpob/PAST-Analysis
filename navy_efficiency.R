@@ -32,12 +32,15 @@ yr.eff <- eff.base %>%
             yr.eff = navy/coastal)
 
 season.eff <- eff.base %>%
-  group_by(transmitter, yr.adjust, mouth.season) %>% 
-  summarize(navy.detected = T %in% mouth) %>% 
-  group_by(yr.adjust, mouth.season) %>% 
-  summarize(navy = sum(navy.detected == T)) %>% 
+  group_by(transmitter, yr.adjust) %>% 
+  filter(mouth == T) %>%
+  summarize(first.mouth = min(date.local)) %>% 
+  mutate(mouth.season = ifelse(month(first.mouth) %in% 4:9,
+                                  'Apr-Sep', 'Oct-Mar')) %>% 
+  group_by(yr.adjust, mouth.season) %>%
+  summarize(navy = n()) %>% 
   left_join(yr.eff[, c(1,3)]) %>% 
   group_by(yr.adjust, mouth.season) %>% 
   summarize(navy = navy,
             coastal = coastal,
-    season.eff = navy/coastal)
+            season.eff = navy/coastal)
