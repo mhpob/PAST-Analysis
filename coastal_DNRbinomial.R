@@ -5,12 +5,17 @@ load('secor.sb.rda')
 occ.data <- secor.sb %>% 
   # filter(date.local >= '2014-03-30',
   #        date.local <= '2014-10-29') %>%
-  mutate(date.floor = lubridate::floor_date(date.local, unit = 'day'),
+  mutate(yr.adjust = ifelse(date.local <= '2015-03-21', 2014,
+                            ifelse(date.local > '2015-03-21' &
+                                     date.local <= '2016-03-21', 2015,
+                                   2016)),
+         date.floor = lubridate::floor_date(date.local, unit = 'day'),
          coastal = ifelse(array %in% c('VA Coast', 'MD Coast', 'DE Coast',
                                 'Hudson', 'Long Island', 'Mass', 'New Jersey'),
                           'YES', 'NO')) %>% 
-  distinct(transmitter, date.floor, coastal, .keep_all = T) %>% 
-  group_by(transmitter) %>% 
+  filter(yr.adjust < 2016) %>% 
+  distinct(transmitter, date.local, coastal, .keep_all = T) %>% 
+  group_by(transmitter, yr.adjust) %>% 
   summarize(length = mean(length),
             coast = sum(coastal == 'YES'),
             bay = sum(coastal == 'NO'),
@@ -18,9 +23,10 @@ occ.data <- secor.sb %>%
   filter(coast + bay > 5) %>% 
   arrange(length)
             
-ggplot(data = occ.data, aes(x = length, y = prop)) + geom_point(size = 3) +
+ggplot(data = occ.data, aes(x = length, y = prop, color = factor(yr.adjust))) +
+  geom_point(size = 3) +
   stat_smooth(method = 'glm', method.args = list(family = 'binomial')) +
-  labs(x = 'Length (mm)', y = 'Coastal Occurrences (%)') +
+  labs(x = 'Length (mm)', y = 'Coastal Occurrences (%)', color = '') +
   theme(axis.title = element_text(size = 22),
         axis.text = element_text(size = 16))
 
