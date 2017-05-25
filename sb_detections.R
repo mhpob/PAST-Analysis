@@ -31,11 +31,10 @@ secor.sb$array <-
       ifelse(arr('marsh|nan'), 'Nanticoke',
       ifelse(arr('rapp|sting|cr '), 'Rappahannock',
       ifelse(arr('vims|^y'), 'York',
-      ifelse(arr('^nn|(g|^r)\\d|bur| poco|^hi|james') |
-               secor.sb$station %in% c('NH8', 'NH10'), 'James',
+      ifelse(arr('^nn|(g|^r)\\d|bur| poco|^hi|james|NH(1*)(8|0)'), 'James',
       ifelse(secor.sb$station %in% c('APM1',
                                      paste0('NH', 12:35)), 'Elizabeth',
-      ifelse(arr('v-|t-|a-|cs-|inner|outer|middle'), 'MD Coast',
+      ifelse(arr('v-|t-|a-|cs-|inner|outer|middle|[iao][nms]\\d'), 'MD Coast',
       ifelse(arr('# 2|# 3'), 'Delaware',
       ifelse(arr('# 1'), 'DE Coast',
       ifelse(arr('sandy|barnegat|shark river'), 'New Jersey',
