@@ -18,24 +18,32 @@ base.data <- secor.sb %>%
 first.coast <- base.data %>% 
   filter(coastal == T) %>% 
   group_by(transmitter, yr.adjust) %>% 
-  summarize(c.firstnum = min(wk.num),
-            c.firstwk = min(wk))
+  summarize(c.firstnum = min(wk.num))
 
-ggplot() + geom_histogram(data = first.coast, aes(c.firstnum)) +
-  facet_wrap(~ yr.adjust, ncol = 1)
+lab.func <- function(x){
+  month(ymd('2014-03-21') %m+% weeks(x), label = T, abbr = T)
+}
+
+ggplot() + geom_histogram(data = first.coast, aes(c.firstnum), bins = 52) +
+  facet_wrap(~ yr.adjust, ncol = 1) +
+  scale_x_continuous(labels = lab.func) +
+  labs(x = 'Arrival in coastal waters', y = 'Count') +
+  theme_bw()
 
 # First week of return to Chesapeake ----
 first.return <- base.data %>% 
   group_by(transmitter, yr.adjust) %>% 
   filter(T %in% coastal) %>% 
   left_join(first.coast) %>% 
-  filter(wk > c.firstwk,
+  filter(wk.num > c.firstnum,
          coastal == F) %>% 
-  summarize(b.firstnum = min(wk.num),
-            b.firstwk = min(wk))
+  summarize(b.firstnum = min(wk.num))
 
 ggplot() + geom_histogram(data = first.return, aes(b.firstnum), bins = 52) +
-  facet_wrap(~ yr.adjust, ncol = 1)
+  facet_wrap(~ yr.adjust, ncol = 1) +
+  scale_x_continuous(labels = lab.func) +
+  labs(x = 'Return to Chesapeake Bay', y = 'Count') +
+  theme_bw()
 
 # First week above Rt 301 ----
 pot.return <- base.data %>% 
@@ -44,8 +52,10 @@ pot.return <- base.data %>%
          array %in% c('Upper Potomac', 'Mid Potomac')) %>% 
   mutate(year = year(date.local)) %>% 
   group_by(transmitter, year) %>% 
-  summarize(p.firstnum = min(wk.num),
-            p.firstwk = min(wk))
+  summarize(p.firstnum = min(wk.num))
 
 ggplot() + geom_histogram(data = pot.return, aes(p.firstnum), bins = 52) +
-  facet_wrap(~ year, ncol = 1)
+  facet_wrap(~ year, ncol = 1) +
+  scale_x_continuous(labels = lab.func) +
+  labs(x = 'Movement above Rt. 301', y = 'Count') +
+  theme_bw()
