@@ -38,8 +38,71 @@ occ.data <- left_join(occ.data, pct.coastal) %>%
   mutate(coastal = ifelse(1 %in% coastal, 1, 0),
          pct.coastal = ifelse(is.na(pct.coastal), 0, pct.coastal)) %>%
   ungroup() %>% 
-  distinct(tag.season, transmitter, year, coastal,
+  distinct(tag.season, transmitter, year, coastal, sex,
            pct.coastal, age.adjust, length)
+
+# # Age/Length v incidence, separated by 2014 tagging event
+# ggplot() + geom_jitter(data = occ.data,
+#                       aes(x = age.adjust, y = pct.coastal, color = tag.season),
+#                       width = 0.1, height = 0.01) +
+#   geom_smooth(data = occ.data,
+#               aes(x = age.adjust, y = pct.coastal, color = tag.season)) +
+#   labs(x = 'Age', y = '% of Year in Coastal Waters', color = 'Tag\nSeason') +
+#   coord_cartesian(ylim = c(-0.01, 0.7)) +
+#   scale_x_continuous(breaks = c(3, 6, 9, 12, 15)) +
+#   theme_bw()
+# 
+# ggplot() + geom_jitter(data = occ.data,
+#                       aes(x = length, y = pct.coastal, color = tag.season),
+#                       width = 0.1, height = 0.01) +
+#   geom_smooth(data = occ.data,
+#               aes(x = length, y = pct.coastal, color = tag.season)) +
+#   labs(x = 'Length (mm)', y = '% of Year in Coastal Waters',
+#        color = 'Tag\nSeason') +
+#   coord_cartesian(ylim = c(-0.01, 0.7)) +
+#   theme_bw()
+
+# # Age/Length v incidence, separated by year
+# ggplot() + geom_jitter(data = occ.data,
+#                       aes(x = age.adjust, y = pct.coastal, color = factor(year)),
+#                       width = 0.1, height = 0.01) +
+#   geom_smooth(data = occ.data,
+#               aes(x = age.adjust, y = pct.coastal, color = factor(year))) +
+#   labs(x = 'Age', y = '% of Year in Coastal Waters', color = 'Year') +
+#   coord_cartesian(ylim = c(-0.01, 0.7)) +
+#   scale_x_continuous(breaks = c(3, 6, 9, 12, 15)) +
+#   theme_bw()
+# 
+# ggplot() + geom_jitter(data = occ.data,
+#                       aes(x = length, y = pct.coastal, color = factor(year)),
+#                       width = 0.1, height = 0.01) +
+#   geom_smooth(data = occ.data,
+#               aes(x = length, y = pct.coastal, color = factor(year))) +
+#   labs(x = 'Length (mm)', y = '% of Year in Coastal Waters',
+#        color = 'Year') +
+#   coord_cartesian(ylim = c(-0.01, 0.7)) +
+#   theme_bw()
+
+# # Sex v coastal incidence
+# ggplot() + geom_jitter(data = filter(occ.data, sex != ''),
+#                        aes(x = age.adjust, y = pct.coastal, color = sex),
+#                        width = 0.1, height = 0.01) +
+#   geom_smooth(data = filter(occ.data, sex != ''),
+#               aes(x = age.adjust, y = pct.coastal, color = sex)) +
+#   labs(x = 'Age', y = '% of Year in Coastal Waters', color = 'Sex') +
+#   coord_cartesian(ylim = c(-0.01, 0.74)) +
+#   scale_x_continuous(breaks = c(3, 6, 9, 12, 15)) +
+#   theme_bw()
+# 
+# ggplot() + geom_jitter(data = filter(occ.data, sex != ''),
+#                        aes(x = length, y = pct.coastal, color = sex),
+#                        width = 0.1, height = 0.01) +
+#   geom_smooth(data = filter(occ.data, sex != ''),
+#               aes(x = length, y = pct.coastal, color = sex)) +
+#   labs(x = 'Length (mm)', y = '% of Year in Coastal Waters',
+#        color = 'Sex') +
+#   coord_cartesian(ylim = c(-0.01, 0.73)) +
+#   theme_bw()
 
 #   Run coastal ~ age + random(fish) for age
 #   Run years separately for length, shouldn't need random transmitter effect
@@ -70,7 +133,7 @@ glm_incidence15 <- glm(coastal ~ length,
                        data = sp.2015,
                        family = 'binomial')
 
-# % Mmonths coastal v age ----
+# % Months coastal v age ----
 library(lme4)
 glm_PctCoast <- glmer(pct.coastal ~ age.adjust + (1 | transmitter),
                       family = 'binomial',
