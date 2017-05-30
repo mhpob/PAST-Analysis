@@ -41,7 +41,7 @@ occ.data <- left_join(occ.data, pct.coastal) %>%
   distinct(tag.season, transmitter, year, coastal, sex,
            pct.coastal, age.adjust, length)
 
-# # Age/Length v incidence, separated by 2014 tagging event
+# Age/Length v incidence, separated by 2014 tagging event ----
 # ggplot() + geom_jitter(data = occ.data,
 #                       aes(x = age.adjust, y = pct.coastal, color = tag.season),
 #                       width = 0.1, height = 0.01) +
@@ -62,7 +62,7 @@ occ.data <- left_join(occ.data, pct.coastal) %>%
 #   coord_cartesian(ylim = c(-0.01, 0.7)) +
 #   theme_bw()
 
-# # Age/Length v incidence, separated by year
+# Age/Length v incidence, separated by year ----
 # ggplot() + geom_jitter(data = occ.data,
 #                       aes(x = age.adjust, y = pct.coastal, color = factor(year)),
 #                       width = 0.1, height = 0.01) +
@@ -83,7 +83,7 @@ occ.data <- left_join(occ.data, pct.coastal) %>%
 #   coord_cartesian(ylim = c(-0.01, 0.7)) +
 #   theme_bw()
 
-# # Sex v coastal incidence
+# Sex v coastal incidence ----
 # ggplot() + geom_jitter(data = filter(occ.data, sex != ''),
 #                        aes(x = age.adjust, y = pct.coastal, color = sex),
 #                        width = 0.1, height = 0.01) +
@@ -104,6 +104,7 @@ occ.data <- left_join(occ.data, pct.coastal) %>%
 #   coord_cartesian(ylim = c(-0.01, 0.73)) +
 #   theme_bw()
 
+# Modeling ----
 #   Run coastal ~ age + random(fish) for age
 #   Run years separately for length, shouldn't need random transmitter effect
 rm(pct.coastal, secor.sb, valid.fish)
