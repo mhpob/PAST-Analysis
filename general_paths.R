@@ -5,13 +5,13 @@ library(TelemetryR); library(dplyr)
 bay.escapes <- secor.sb %>%
   filter(array %in% c('Bay Mouth', 'C&D', 'DE Coast', 'Delaware', 'Long Island',
                       'Mass', 'MD Coast', 'New Jersey', 'VA Coast'))
-bay.escapes <- unique(bay.escapes$trans.num)
+bay.escapes <- unique(bay.escapes$transmitter)
 bay.escapes <- secor.sb %>%
-  filter(trans.num %in% bay.escapes) %>%
+  filter(transmitter %in% bay.escapes) %>%
   arrange(date.local) %>%
   data.frame
 
-bay.escapes <- split(bay.escapes, bay.escapes$trans.num)
+bay.escapes <- split(bay.escapes, bay.escapes$transmitter)
 
 # Create a character vector with in the order of visted arrays
 escape.tracks <- lapply(bay.escapes, track, dates = 'date.local',
@@ -28,13 +28,13 @@ paste('Number that got to Delaware =',
 ## Fish staying in the Potomac River
 pot.escapes <- secor.sb %>%
   filter(!array %in% c('Lower Potomac', 'Mid Potomac', 'Upper Potomac'))
-pot.escapes <- unique(pot.escapes$trans.num)
+pot.escapes <- unique(pot.escapes$transmitter)
 pot.residents <- secor.sb %>%
-  filter(!trans.num %in% pot.escapes) %>%
+  filter(!transmitter %in% pot.escapes) %>%
   arrange(date.local) %>%
   data.frame
 
-pot.residents <- split(pot.residents, pot.residents$trans.num)
+pot.residents <- split(pot.residents, pot.residents$transmitter)
 
 lapply(pot.residents, track, dates = 'date.local',
             ids = 'array')
@@ -44,12 +44,12 @@ lapply(pot.residents, track, dates = 'date.local',
 escapes <- secor.sb %>%
   filter(array %in% c('Bay Mouth', 'C&D', 'DE Coast', 'Delaware', 'Long Island',
                       'Mass', 'MD Coast', 'New Jersey', 'VA Coast'))
-escapes <- unique(escapes$trans.num)
+escapes <- unique(escapes$transmitter)
 bay.residents <- secor.sb %>%
-  filter(!trans.num %in% escapes)
-bay.residents <- unique(bay.residents$trans.num)
+  filter(!transmitter %in% escapes)
+bay.residents <- unique(bay.residents$transmitter)
 bay.residents <- secor.sb %>%
-  filter(trans.num %in% bay.residents) %>%
+  filter(transmitter %in% bay.residents) %>%
   arrange(date.local) %>%
   data.frame
 
