@@ -1,11 +1,8 @@
-#install.packages("waterData")
-#library(waterData)
+library(waterData)
 
-#CB_discharge <- importDVs("01646580", code = "00060", stat = "00003", sdate = "2014-01-01", edate = "2016-12-31")
+CB_discharge <- importDVs("01646500", code = "00010", stat = "00003",
+                          sdate = "2014-01-01", edate = "2016-12-31")
 
-# discharge_URL <- tellMeURL("01646580", code=00060, stat = 00003, sdate = 2014-01-01, edate = 2016-12-31)
-# discharge_URL
-# 'ERROR SENT BY CLIENT WAS SYNTACTICALLY INCORRECT'
 
 library(readxl)
 chain_bridge <- read_excel("P:/Wiernicki/Chain Bridge Flow Data.xlsx")
