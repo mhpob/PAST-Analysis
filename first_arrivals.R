@@ -50,12 +50,14 @@ pot.return <- base.data %>%
   filter(month(date.local) %in% 2:5,
          # date.local > '2014-06-01',
          array %in% c('Upper Potomac', 'Mid Potomac')) %>% 
-  mutate(year = year(date.local)) %>% 
-  group_by(transmitter, year) %>% 
+  mutate(year = year(date.local),
+         sex = ifelse(sex == '', 'Unknown', sex)) %>% 
+  group_by(transmitter, year, sex) %>% 
   summarize(p.firstnum = min(wk.num))
 
-ggplot() + geom_histogram(data = pot.return, aes(p.firstnum), bins = 52) +
+ggplot() + geom_histogram(data = pot.return, aes(p.firstnum, fill = sex),
+                          bins = 52) +
   facet_wrap(~ year, ncol = 1) +
   scale_x_continuous(labels = lab.func) +
-  labs(x = 'Movement above Rt. 301', y = 'Count') +
+  labs(x = 'Movement above Rt. 301', y = 'Count', fill = 'Sex') +
   theme_bw()
