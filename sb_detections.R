@@ -36,7 +36,7 @@ secor.sb$array <-
                                      paste0('NH', 12:35)), 'Elizabeth',
       ifelse(arr('v-|t-|a-|cs-|inner|outer|middle|[iao][nms]\\d'), 'MD Coast',
       ifelse(arr('# 2|# 3'), 'Delaware',
-      ifelse(arr('# 1'), 'DE Coast',
+      ifelse(arr('# 1|BOEM_'), 'DE Coast',
       ifelse(arr('sandy|barnegat|shark river'), 'New Jersey',
       ifelse(arr('^light|storm'), 'Hudson',
       ifelse(arr('fire|inlet \\d|jones|montauk|rockaway|shinnecock|swg|thames') |
