@@ -6,14 +6,14 @@ chainbr <- chainbr %>%
   mutate(year = year(dates),
          doy = yday(dates))
 
-j <- ggplot() + geom_line(data = chainbr, aes(x = doy, y = val)) +
+env.plots <- ggplot() + geom_line(data = chainbr, aes(x = doy, y = val)) +
   facet_grid(var ~ year, scales = 'free') +
-  lims(x = c(32, 152)) +
+  lims(x = c(32, 152)) + #Feb 1 - May 31
   labs(x = NULL) +
   theme_bw() +
   theme(axis.ticks.x = element_blank(),
         axis.text.x = element_blank(),
-        plot.margin = unit(c(1,1,1,1), 'mm'))
+        plot.margin = unit(c(1, 1, 1, 1), 'mm'))
 load('secor.sb.rda')
 
 pot.return <- secor.sb %>% 
@@ -26,11 +26,11 @@ pot.return <- secor.sb %>%
   summarize(firstwk = min(week),
             doy = yday(firstwk))
 
-k <- ggplot() + geom_histogram(data = pot.return, aes(doy, fill = sex),
+imm.plots <- ggplot() + geom_histogram(data = pot.return, aes(doy, fill = sex),
                           bins = 52) +
   facet_wrap( ~ year, ncol = 4) +
-  lims(x = c(32, 152))+
-  labs(x = 'Movement above Rt. 301', y = 'Count', fill = 'Sex') +
+  lims(x = c(32, 152)) +
+  labs(x = 'Day of Year', y = 'Count', fill = 'Sex') +
   theme_bw() +
   theme(legend.position = c(0.95, 0.66),
         legend.background = element_blank(),
@@ -40,5 +40,5 @@ k <- ggplot() + geom_histogram(data = pot.return, aes(doy, fill = sex),
         plot.margin = unit(c(0.75, 7.5, 2, 4.8), 'mm'))
 
 library(gridExtra)
-grid.arrange(j, k,
-             ncol = 1, heights = c(1.75,1))
+grid.arrange(env.plots, imm.plots,
+             ncol = 1, heights = c(1.75, 1))
