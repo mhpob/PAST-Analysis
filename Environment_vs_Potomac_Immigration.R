@@ -14,7 +14,6 @@ j <- ggplot() + geom_line(data = chainbr, aes(x = doy, y = val)) +
   theme(axis.ticks.x = element_blank(),
         axis.text.x = element_blank(),
         plot.margin = unit(c(1,1,1,1), 'mm'))
-j
 load('secor.sb.rda')
 
 pot.return <- secor.sb %>% 
@@ -40,16 +39,6 @@ k <- ggplot() + geom_histogram(data = pot.return, aes(doy, fill = sex),
         plot.background = element_blank(),
         plot.margin = unit(c(0.75, 7.5, 2, 4.8), 'mm'))
 
+library(gridExtra)
 grid.arrange(j, k,
              ncol = 1, heights = c(1.75,1))
-
-library(gridExtra)
-
-# blankPlot <- ggplot() + geom_blank() +
-#   theme_bw() +
-#   theme(panel.border = element_blank())
-# blankPlot
-
-grid.arrange(j, arrangeGrob(blankPlot, k, blankPlot, ncol = 3,
-                            widths = c(0.017, 0.95, 0.03)),
-             ncol = 1, heights = 2:1)
