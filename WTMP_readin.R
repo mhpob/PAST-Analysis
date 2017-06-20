@@ -29,13 +29,17 @@ WTMP <- function(x){
                      data$mm, sep = "-")
   data$date <- lubridate::ymd_hm(data$date)
   
-  data <- data[, c('site', 'lat', 'long', 'date', 'WTMP')]
+  data <- data[data$WTMP != 999, c('site', 'lat', 'long', 'date', 'WTMP')]
   
-  data[data$WTMP == 999, 'WTMP'] <- NA
   row.names(data) <- NULL
   
   data
 }
 
-potomac <- WTMP('P:/Wiernicki/Potomac River Wt.xlsx')
-coastal <- WTMP('P:/Wiernicki/East Coast WT.xlsx')
+potomac <- WTMP('P:/Wiernicki/striped bass/temperature data/Potomac River Wt.xlsx')
+potomac$date <- lubridate::floor_date(lubridate::ymd_hms(potomac$date), unit = 'day')
+
+j <- aggregate(WTMP ~ site + lat + long + date, data = potomac, FUN = mean)
+
+
+coastal <- WTMP('P:/Wiernicki/striped bass/temperature data/East Coast WT.xlsx')
