@@ -1,5 +1,7 @@
 library(TelemetryR); library(lubridate); library(dplyr)
 
+# Import/Munging ----
+
 detects <- vemsort('p:/obrien/biotelemetry/detections')
 
 secor.sb <- detects %>% 
@@ -47,6 +49,14 @@ secor.sb$array <-
       ifelse(arr('(^b|ts)\\d|CBB|LC|henry|cc ls|\\dch|^ch$'),'Bay Mouth',
       ifelse(arr('(^cb|ri)($|\\d)|^nc|^ra$|rao|scl|wea'), 'VA Coast',
              'Other')))))))))))))))))))))))
+
+# Array testing ----
+
+if(dim(filter(secor.sb, array == 'Other'))[1] > 1){
+  stop('UNID array found!')
+}
+
+# Data joins and export ----
 
 tag.data <- read.csv('p:/obrien/biotelemetry/PAST SB/taggingdata.csv',
                      stringsAsFactors = F)
