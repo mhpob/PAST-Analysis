@@ -1,7 +1,6 @@
 library(TelemetryR); library(lubridate); library(dplyr)
 
 # Import/Munging ----
-
 detects <- vemsort('p:/obrien/biotelemetry/detections')
 
 secor.sb <- detects %>% 
@@ -9,52 +8,83 @@ secor.sb <- detects %>%
          transmitter %in% paste0('A69-1601-', seq(53850, 53899, 1))) %>%
   select(-one_of('trans.name', 'trans.serial', 'sensor.value',
                  'sensor.unit')) %>% 
+  mutate(array = NA) %>% 
   data.frame()
 
-arr <- function(part){grepl(part, secor.sb[, 'station'], ignore.case = T)}
-  
-secor.sb$array <- 
-      ifelse(arr('piney|pot|look'), 'Lower Potomac',
-      ifelse(arr('301|rad') | secor.sb$station == 'Report1', 'Mid Potomac',
-      ifelse(secor.sb$station %in% c('Alexandria', 'Dogue Creek', 'Hains Point',
-                  'Mattawoman', 'National Harbor', 'Piscataway', 'Pomonkey',
-                  'Roosevelt Br.', 'S. Capitol Br.', 'S. Craney Isl.', 'Report2',
-                  'Report8'),
-             'Upper Potomac',
-      ifelse(arr('cbl|jacks|pax|nott|jug') |
-               secor.sb$station %in% c('Benedicts Bridge', 'Broomes',
-                   'Magruders', 'Pepco', 'SERC Active'), 'Patuxent',
-      ifelse(arr('chop'), 'Choptank',
-      ifelse(arr('kent|annap|dock|rho') | secor.sb$station %in% c('Report3',
-                                    'Report7', 'Report9'), 'Mid MD Bay',
-      ifelse(arr('cedar|goose'), 'Lower MD Bay',
-      ifelse(arr('elk|pata') | secor.sb$station == 'Report5', 'Upper MD Bay',
-      ifelse(arr('&| 32'), 'C&D',
-      ifelse(arr('marsh|nan'), 'Nanticoke',
-      ifelse(arr('rapp|sting|cr '), 'Rappahannock',
-      ifelse(arr('vims|^y'), 'York',
-      ifelse(arr('^nn|(g|^r)\\d|bur| poco|^hi|james|NH(1*)(8|0)'), 'James',
-      ifelse(secor.sb$station %in% c('APM1',
-                                     paste0('NH', 12:35)), 'Elizabeth',
-      ifelse(arr('([vat]|cs)-|inner|outer|middle|[iao][nms]\\d'), 'MD Coast',
-      ifelse(arr('# 2|# 3'), 'Delaware',
-      ifelse(arr('# 1|BOEM'), 'DE Coast',
-      ifelse(arr('sandy|barnegat|shark river'), 'New Jersey',
-      ifelse(arr('^light|storm|nysta'), 'Hudson',
-      ifelse(arr('fire|inlet \\d|jones|montauk|rockaway|shinnecock|swg|thames') |
-               secor.sb$station == 'Report4', 'Long Island',
-      ifelse(arr('(ca|cz|bb|bh|^er|ph|vs)\\d|dmf|vine|nera|plum|joppa|nau|chat|
-                 |mono|cove|elli| inl|orl|sci|jer|ccc'),
-             'Mass',
-      ifelse(arr('(^b|ts)\\d|CBB|LC|henry|cc ls|\\dch|^ch$'),'Bay Mouth',
-      ifelse(arr('(^cb|ri)($|\\d)|^nc|^ra$|rao|scl|wea'), 'VA Coast',
-             'Other')))))))))))))))))))))))
+array_greps <- list(
+  'Lower Potomac' = 'piney|pot|look',
+  'Mid Potomac' = '301|rad',
+  'Patuxent' = 'cbl|jacks|pax|nott|jug',
+  'Choptank' = 'chop',
+  'Mid MD Bay' = 'kent|annap|dock|rho',
+  'Lower MD Bay' = 'cedar|goose',
+  'Upper MD Bay' = 'elk|pata',
+  'C&D' = '&| 32',
+  'Nanticoke' = 'marsh|nan',
+  'Rappahannock' = 'rapp|sting|cr ',
+  'York' = 'vims|^y',
+  'James' = '^nn|(g|^r)\\d|bur| poco|^hi|james|NH(1*)(8|0)',
+  'MD Coast' = '([vat]|cs)-|inner|outer|middle|[iao][nms]\\d',
+  'Delaware' = '# 2|# 3',
+  'DE Coast' = '# 1|BOEM',
+  'New Jersey' = 'sandy|barnegat|shark river',
+  'Hudson' = '^light|storm|nysta',
+  'Long Island' = 'fire|inlet \\d|jones|montauk|rockaway|shinnecock|
+              |swg|thames',
+  'Mass' = '(ca|cz|bb|bh|^er|ph|vs)\\d|dmf|vine|nera|plum|joppa|nau|
+              |chat|mono|cove|elli| inl|orl|sci|jer|ccc',
+  'Bay Mouth' = '(^b|ts)\\d|CBB|LC|henry|cc ls|\\dch|^ch$',
+  'VA Coast' = '(^cb|ri)($|\\d)|^nc|^ra$|rao|scl|wea'
+)
 
-# Array testing ----
+addons <- list(
+  'Mid Potomac' = 'Report1',
+  'Upper Potomac' = c('Alexandria', 'Dogue Creek', 'Hains Point',
+                      'Mattawoman', 'National Harbor', 'Piscataway', 'Pomonkey',
+                      'Roosevelt Br.', 'S. Capitol Br.', 'S. Craney Isl.',
+                      'Report2', 'Report8'),
+  'Patuxent' = c('Benedicts Bridge', 'Broomes', 'Magruders',
+                 'Pepco', 'SERC Active'),
+  'Mid MD Bay' = c('Report3', 'Report7', 'Report9'),
+  'Upper MD Bay' = 'Report5',
+  'Elizabeth' = c('APM1', paste0('NH', 12:35)),
+  'Long Island' = 'Report4'
+  )
 
-if(dim(filter(secor.sb, array == 'Other'))[1] > 1){
+station_list <- lapply(array_greps,
+                       grep, x = unique(secor.sb$station),
+                       ignore.case = T, value = T)
+
+for(i in seq(1:length(names(addons)))){
+  station_list[[names(addons)[i]]] <-
+    c(station_list[[names(addons)[i]]], addons[[i]])
+}
+
+
+# Array designation test
+grep_check <- sapply(1:length(station_list),
+                     function(n) intersect(station_list[[n]],
+                                           unlist(station_list[-n])))
+if(length(unlist(grep_check)) != 0){
+  names(grep_check) <- names(station_list)
+  print(unlist(grep_check))
+  stop('Regex matches multiple stations!!')
+}
+
+
+# Designate arrays
+for(i in seq(1:length(station_list))){
+  secor.sb$array <- ifelse(secor.sb$station %in% station_list[[i]],
+                            names(station_list)[i],
+                            secor.sb$array)
+}
+
+
+# Missing array info test
+if(dim(filter(secor.sb, is.na(array)))[1] > 1){
   stop('UNID array found!')
 }
+
 
 # Data joins and export ----
 
