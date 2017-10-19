@@ -34,18 +34,18 @@ secor.sb$array <-
       ifelse(arr('^nn|(g|^r)\\d|bur| poco|^hi|james|NH(1*)(8|0)'), 'James',
       ifelse(secor.sb$station %in% c('APM1',
                                      paste0('NH', 12:35)), 'Elizabeth',
-      ifelse(arr('v-|t-|a-|cs-|inner|outer|middle|[iao][nms]\\d'), 'MD Coast',
+      ifelse(arr('([vat]|cs)-|inner|outer|middle|[iao][nms]\\d'), 'MD Coast',
       ifelse(arr('# 2|# 3'), 'Delaware',
-      ifelse(arr('# 1|BOEM_'), 'DE Coast',
+      ifelse(arr('# 1|BOEM'), 'DE Coast',
       ifelse(arr('sandy|barnegat|shark river'), 'New Jersey',
       ifelse(arr('^light|storm|nysta'), 'Hudson',
       ifelse(arr('fire|inlet \\d|jones|montauk|rockaway|shinnecock|swg|thames') |
                secor.sb$station == 'Report4', 'Long Island',
-      ifelse(arr('dmf|vine|cz|ph|nera|plum|joppa|^er|(ca|bb|bh)\\d|nau|chat|
-                 |mono|cove|elli| inl|orl|sci|jer|ccc|vs'),
+      ifelse(arr('(ca|cz|bb|bh|^er|ph|vs)\\d|dmf|vine|nera|plum|joppa|nau|chat|
+                 |mono|cove|elli| inl|orl|sci|jer|ccc'),
              'Mass',
       ifelse(arr('(^b|ts)\\d|CBB|LC|henry|cc ls|\\dch|^ch$'),'Bay Mouth',
-      ifelse(arr('(^cb|ri)($|\\d)|^nc|^(ra$|rao)|scl|wea'), 'VA Coast',
+      ifelse(arr('(^cb|ri)($|\\d)|^nc|^ra$|rao|scl|wea'), 'VA Coast',
              'Other')))))))))))))))))))))))
 
 tag.data <- read.csv('p:/obrien/biotelemetry/PAST SB/taggingdata.csv',
