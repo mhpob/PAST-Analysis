@@ -5,6 +5,7 @@ load('secor.sb.rda')
 secor.sb <- secor.sb %>% 
   filter(transmitter %in% paste0('A69-1601-', seq(25434, 25533, 1)))
 
+<<<<<<< HEAD
 nan <- filter(secor.sb, array == 'Nanticoke')
 
 unique(filter(secor.sb, date.local >= '2015-05-31')$transmitter)
@@ -33,6 +34,38 @@ occ.data <- secor.sb %>%
                           1, 0),
          age.adjust = ifelse(date.local >= '2015-04-01',
                              age + 1, age))
+=======
+library(TelemetryR)
+sb.list <- split(secor.sb, secor.sb$transmitter)
+sb.list <- lapply(sb.list, track, dates = 'date.local', ids = 'array')
+
+for(i in 1:length(sb.list)){
+  sb.list[[i]]$transmitter <- names(sb.list)[i]
+}
+sb.tracks <- do.call(rbind.data.frame, sb.list)
+
+# # Select fish that lived long enough
+# valid.fish <- secor.sb %>% 
+#   group_by(transmitter) %>%
+#   summarize(max = max(date.local)) %>% 
+#   filter(max >= '2016-03-31')
+# 
+# occ.data <- secor.sb %>% 
+#   left_join(valid.fish) %>% 
+#   # Use flag to remove observations if fish didn't make it through year
+#   mutate(yr.flag = ifelse(yr.flag == 2014 & date.local >= '2015-04-01',
+#                           NA, yr.flag)) %>% 
+#   filter(!is.na(yr.flag),
+#          date.local < '2016-04-01') %>% 
+#   mutate(tag.season = ifelse(tag.date == '2014-10-30', 'Fall', 'Spring'),
+#          date.floor = floor_date(date.local, unit = 'month'),
+#          year = ifelse(date.local < '2015-04-01', 2014, 2015),
+#          coastal = ifelse(array %in% c('VA Coast', 'MD Coast', 'DE Coast',
+#                                        'Hudson', 'Long Island', 'Mass', 'New Jersey'),
+#                           1, 0),
+#          age.adjust = ifelse(date.local >= '2015-04-01',
+#                              age + 1, age))
+>>>>>>> cc83a2cbde60b7f7e74e15f2338046311df97c04
 
 # Detections in Apr and May
 apr_may <- secor.sb %>% 

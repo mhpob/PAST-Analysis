@@ -1,16 +1,45 @@
-library(OpenStreetMap)
-map <- openmap(c(42.95, -77.5), c(36.5, -69), type = 'mapquest-aerial')
-map <- autoplot.OpenStreetMap(openproj(map))
-map
 load('secor.sb.rda')
-names(secor.sb)
-stations <- unique(secor.sb[,c('lat', 'long')])
+
+library(raster)
+midstates <- shapefile('p:/obrien/midatlantic/matl_states_land.shp')
+
 library(ggplot2)
-map + geom_point(data = stations, aes(x = long, y = lat),
-                 color = 'red', size = 4, shape = 21) +
-  theme(legend.position = 'none',
-        plot.background = element_blank(),
-        axis.text = element_blank(),
-        axis.title = element_blank(),
-        rect = element_blank(),
-        line = element_blank())
+midstates <- fortify(midstates)
+
+base_map <- ggplot() +
+  geom_polygon(data = midstates, aes(x = long, y = lat, group = group),
+               fill  = 'lightgrey', color = 'black') +
+  coord_map(xlim = c(-77.5, -69), ylim = c(36.5, 42.95)) +
+  labs(x = 'Longitude', y = 'Latitude')
+
+
+stations <- unique(secor.sb[,c('lat', 'long')])
+base_map + geom_point(data = stations, aes(x = as.numeric(long), y = as.numeric(lat)),
+                 color = 'red', size = 4, shape = 21) 
+
+library(dplyr)
+past2014 <- filter(secor.sb, grepl('-25', transmitter))
+p14_stations <- unique(past2014[,c('lat', 'long')])
+base_map + geom_point(data = p14_stations, aes(x = as.numeric(long),
+                                               y = as.numeric(lat)),
+                      color = 'red', size = 4, shape = 21) 
+
+
+past2016 <- filter(secor.sb, grepl('-53', transmitter))
+p16_stations <- unique(past2016[,c('lat', 'long')])
+base_map + geom_point(data = p16_stations, aes(x = as.numeric(long),
+                                               y = as.numeric(lat)),
+                      color = 'red', size = 4, shape = 21) 
+
+by_month <- secor.sb %>% 
+  mutate(month = lubridate::month(date.local)) %>% 
+  distinct(transmitter, month, lat, long) %>% 
+  group_by(month, lat, long) %>% 
+  summarize(n = n())
+
+
+base_map + geom_point(data = by_month, aes(x = as.numeric(long),
+                                           y = as.numeric(lat),
+                                           size = n),
+                      color = 'red', shape = 21) +
+  facet_wrap(~month)
