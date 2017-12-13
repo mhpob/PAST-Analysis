@@ -90,8 +90,8 @@ if(dim(filter(secor.sb, is.na(array)))[1] > 1){
 
 tag.data <- read.csv('p:/obrien/biotelemetry/PAST SB/taggingdata.csv',
                      stringsAsFactors = F)
-tag.data$Date <- mdy(tag.data$Date, tz = 'America/New_York')
-tag.data <- tag.data[, c('Date', 'Tag.ID', 'Length..TL..mm.',
+tag.data$Date <- mdy(tag.data$Tag.Date, tz = 'America/New_York')
+tag.data <- tag.data[, c('Tag.Date', 'Transmitter', 'Length..TL..mm.',
                          'Weight..kg.', 'Sex', 'Age.Scale')]
 names(tag.data) <- c('tag.date', 'transmitter', 'length',
                      'weight', 'sex', 'age')
