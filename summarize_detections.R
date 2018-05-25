@@ -35,3 +35,10 @@ season_size <- secor.sb %>%
   arrange(-fish)
 
 
+ches_coast <- secor.sb %>% 
+  mutate(coast = case_when(grepl('New|Long|Coast|Mass|NYB|Delaware|Hud', array) ~ 'Coastal',
+                           T ~ 'Chesapeake'),
+         year = lubridate::year(date.local)) %>% 
+  distinct(year, coast, station) %>%
+  xtabs(data = ., formula = ~ coast + year)
+  
