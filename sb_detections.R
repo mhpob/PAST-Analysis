@@ -16,7 +16,7 @@ array_greps <- list(
   'Mid Potomac' = '301|rad',
   'Patuxent' = 'cbl|jacks|pax|nott|jug',
   'Choptank' = 'chop',
-  'Mid MD Bay' = 'kent|annap|dock|rho',
+  'Mid MD Bay' = 'kent|annap|dock|rho|thomas',
   'Lower MD Bay' = 'cedar|goose',
   'Upper MD Bay' = 'elk|pata',
   'C&D' = '&|back creek',
@@ -29,10 +29,12 @@ array_greps <- list(
   'DE Coast' = '# 1|BOEM|gate',
   'New Jersey' = 'sandy|barnegat|shark river',
   'Hudson' = '^light|storm|nysta',
+  'NYB' = 'stony',
   'Long Island' = 'fire|inlet \\d|jones|montauk|rockaway|shinnecock|
               |swg|thames',
   'Mass' = '(ca|cz|bb|bh|^er|ph|vs)\\d|dmf|vine|nera|plum|joppa|nau|
-              |chat|mono|cove|elli| inl|orl|sci|jer|ccc',
+              |chat|mono|cove|elli| inl|orl|sci|jer|ccc|sandwich|guard|scor|
+              |province|cutty|mano|barns',
   'Bay Mouth' = '(^b|ts)\\d|CBB|LC|henry|cc ls|\\dch|^ch$',
   'VA Coast' = '(^cb|ri)($|\\d)|^nc|^ra$|rao|scl|wea'
 )
