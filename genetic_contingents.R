@@ -5,7 +5,6 @@ load('secor.sb.rda')
 secor.sb <- secor.sb %>% 
   filter(transmitter %in% paste0('A69-1601-', seq(25434, 25533, 1)))
 
-<<<<<<< HEAD
 nan <- filter(secor.sb, array == 'Nanticoke')
 
 unique(filter(secor.sb, date.local >= '2015-05-31')$transmitter)
@@ -34,7 +33,7 @@ occ.data <- secor.sb %>%
                           1, 0),
          age.adjust = ifelse(date.local >= '2015-04-01',
                              age + 1, age))
-=======
+
 library(TelemetryR)
 sb.list <- split(secor.sb, secor.sb$transmitter)
 sb.list <- lapply(sb.list, track, dates = 'date.local', ids = 'array')
@@ -65,7 +64,6 @@ sb.tracks <- do.call(rbind.data.frame, sb.list)
 #                           1, 0),
 #          age.adjust = ifelse(date.local >= '2015-04-01',
 #                              age + 1, age))
->>>>>>> cc83a2cbde60b7f7e74e15f2338046311df97c04
 
 # Detections in Apr and May
 apr_may <- secor.sb %>% 
