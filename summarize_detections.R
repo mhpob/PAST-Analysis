@@ -34,11 +34,25 @@ season_size <- secor.sb %>%
   summarize(fish = length(unique(trans.num))) %>% 
   arrange(-fish)
 
-
-ches_coast <- secor.sb %>% 
+# Stations detecting fish, ches v coast per year
+secor.sb %>% 
   mutate(coast = case_when(grepl('New|Long|Coast|Mass|NYB|Delaware|Hud', array) ~ 'Coastal',
                            T ~ 'Chesapeake'),
          year = lubridate::year(date.local)) %>% 
   distinct(year, coast, station) %>%
   xtabs(data = ., formula = ~ coast + year)
-  
+
+# Numbers of fish, receiver location (ches v coast) per year
+secor.sb %>% 
+  mutate(coast = case_when(grepl('New|Long|Coast|Mass|NYB|Delaware|Hud', array) ~ 'Coastal',
+                           T ~ 'Chesapeake'),
+         year = lubridate::year(date.local)) %>% 
+  distinct(year, coast, transmitter) %>%
+  xtabs(data = ., formula = ~ coast + year)
+
+# Number of detections, receiver location (ches v coast) per year
+secor.sb %>% 
+  mutate(coast = case_when(grepl('New|Long|Coast|Mass|NYB|Delaware|Hud', array) ~ 'Coastal',
+                           T ~ 'Chesapeake'),
+         year = lubridate::year(date.local)) %>%
+  xtabs(data = ., formula = ~ coast + year)
