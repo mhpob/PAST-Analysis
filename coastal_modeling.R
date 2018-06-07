@@ -2,44 +2,124 @@ library(lubridate); library(ggplot2); library(dplyr)
 load('secor.sb.rda')
 
 # Data prep ----
-# Select fish that lived long enough, flag those that didn't make it through
-#   2015 season (mutate line)
-valid.fish <- secor.sb %>% 
-  filter(tag.date <= '2014-10-30') %>% 
+valid.fish <- secor.sb %>%
   group_by(transmitter) %>%
-  summarize(max = max(date.local)) %>% 
-  filter(max >= '2015-03-31') %>% 
-  mutate(yr.flag = ifelse(max <= '2016-03-31', 2014, 2015))
+  summarize(max = max(date.local)) %>%
+  left_join(secor.sb) %>%
+  filter(grepl('[34]/\\d*/2014', tag.date) |
+           (tag.date == '10/30/2014' & year(date.local) >= 2015),
+         !grepl('465', transmitter)) %>%
+  mutate(year = year(date.local)) %>%
+  group_by(transmitter, year, max) %>%
+  summarize(max.yr = max(date.local),
+            max.mo = month(max.yr)) %>%
+  # Select fish that either 1) made it into August of that year, or 2) who
+  # weren't heard after July of a year, but were heard in years after
+  filter(max.mo >= 8 | max > max.yr)
 
-occ.data <- secor.sb %>% 
-  left_join(valid.fish) %>% 
-  # Use flag to remove observations if fish didn't make it through year
-  mutate(yr.flag = ifelse(yr.flag == 2014 & date.local >= '2015-04-01',
-                          NA, yr.flag)) %>% 
-  filter(!is.na(yr.flag),
-         date.local < '2016-04-01') %>% 
-  mutate(tag.season = ifelse(tag.date == '2014-10-30', 'Fall', 'Spring'),
-         date.floor = floor_date(date.local, unit = 'month'),
-         year = ifelse(date.local < '2015-04-01', 2014, 2015),
-         coastal = ifelse(array %in% c('VA Coast', 'MD Coast', 'DE Coast',
-                                'Hudson', 'Long Island', 'Mass', 'New Jersey'),
-                          1, 0),
-         age.adjust = ifelse(date.local >= '2015-04-01',
-                             age + 1, age))
+valid.data <- valid.fish %>%
+  left_join(mutate(secor.sb, year = year(date.local))) %>% 
+  mutate(age = age + (year - 2014),
+         coastal = case_when(array %in% c('VA Coast', 'MD Coast', 'DE Coast',
+                                          'NYB', 'Hudson', 'Long Island', 'Mass',
+                                          'New Jersey') ~ T,
+                             T ~ F)) %>% 
+  group_by(transmitter, year, age, length, weight, sex) %>% 
+  summarize(coastal = T %in% coastal) %>% 
+  mutate(c.num = ifelse(coastal == T, 1, 0))
 
-pct.coastal <- occ.data %>% 
-  filter(coastal == T) %>% 
-  distinct(transmitter, date.floor, .keep_all = T) %>%
-  group_by(transmitter, age.adjust) %>% 
-  summarize(pct.coastal = n()/12)
+# Logistic regression plot
+library(ggplot2)
+logis_plot <- function(variable){
+  variable <- enquo(variable)
+  ggplot() + geom_point(data = valid.data, aes(x = !! variable, y = c.num,
+                                               color = as.factor(year))) +
+    stat_smooth(data = valid.data, aes(x = !! variable, y = c.num,
+                                       color = as.factor(year)),
+                method = 'glm', method.args = list(family = 'binomial')) +
+    labs(x = variable, y = 'Proportion Coastal', color = 'Year') +
+    theme_bw()
+}
 
-occ.data <- left_join(occ.data, pct.coastal) %>% 
-  group_by(transmitter, year) %>% 
-  mutate(coastal = ifelse(1 %in% coastal, 1, 0),
-         pct.coastal = ifelse(is.na(pct.coastal), 0, pct.coastal)) %>%
-  ungroup() %>% 
-  distinct(tag.season, transmitter, year, coastal, sex,
-           pct.coastal, age.adjust, length)
+logis_plot(age)
+logis_plot(length)
+logis_plot(weight)
+
+
+### Per-year model fitting and bootstrapping ----
+log_emig <- split(valid.data, valid.data$year)
+
+## Logistic regression on a variable vs T/F coastal
+l_e_fit <- function(variable){
+  form <- as.formula(paste0('c.num ~ ', variable))
+  lapply(log_emig, function(x){
+    glm(form, family = 'binomial', data = x)
+  })
+}
+
+age_fit <- l_e_fit('age')
+tl_fit <- l_e_fit('length')
+wt_fit <- l_e_fit('weight')
+
+## Bootstrapping
+library(boot)
+
+# Funtion to be bootstrapped
+boot_fun <- function(x, indices){
+  d <- x[indices,]
+  fit <- glm(c.num ~ age, family = binomial, data = d)
+  coeffs <- coef(fit)
+  
+  # Formula below is reduction of ((log(prop / (1 - prop)) - intercept) / age)
+  # where prop = 0.5. Used to calculate age @ 50% coastal. Can be adjusted
+  # later if different proportions are desired
+  a50 <- setNames(-coeffs[1] / coeffs[2], 'a50')
+  coeffs <- c(coeffs, a50)
+  
+  # Returns GLM coefficients and the length at 50% coastal
+  coeffs
+}
+
+# Apply 10k times over each year subset
+l_e_boot <- lapply(log_emig, boot, statistic = boot_fun, R = 10000)
+
+# BCa (adjusted bootstrap percentile) 95% CIs
+l_e_bootci <- lapply(l_e_boot, function(x){
+  list(intercept = boot.ci(x, index = 1, type = 'bca'),
+       age = boot.ci(x, index = 2, type = 'bca'),
+       a50 = boot.ci(x, index = 3, type = 'bca'))
+})
+
+
+# occ.data <- secor.sb %>% 
+#   left_join(valid.fish) %>% 
+#   # Use flag to remove observations if fish didn't make it through year
+#   mutate(yr.flag = ifelse(yr.flag == 2014 & date.local >= '2015-04-01',
+#                           NA, yr.flag)) %>% 
+#   filter(!is.na(yr.flag),
+#          date.local < '2016-04-01') %>% 
+#   mutate(tag.season = ifelse(tag.date == '2014-10-30', 'Fall', 'Spring'),
+#          date.floor = floor_date(date.local, unit = 'month'),
+#          year = ifelse(date.local < '2015-04-01', 2014, 2015),
+#          coastal = ifelse(array %in% c('VA Coast', 'MD Coast', 'DE Coast',
+#                                 'Hudson', 'Long Island', 'Mass', 'New Jersey'),
+#                           1, 0),
+#          age.adjust = ifelse(date.local >= '2015-04-01',
+#                              age + 1, age))
+
+# pct.coastal <- occ.data %>% 
+#   filter(coastal == T) %>% 
+#   distinct(transmitter, date.floor, .keep_all = T) %>%
+#   group_by(transmitter, age.adjust) %>% 
+#   summarize(pct.coastal = n()/12)
+# 
+# occ.data <- left_join(occ.data, pct.coastal) %>% 
+#   group_by(transmitter, year) %>% 
+#   mutate(coastal = ifelse(1 %in% coastal, 1, 0),
+#          pct.coastal = ifelse(is.na(pct.coastal), 0, pct.coastal)) %>%
+#   ungroup() %>% 
+#   distinct(tag.season, transmitter, year, coastal, sex,
+#            pct.coastal, age.adjust, length)
 
 # Age/Length v incidence, separated by 2014 tagging event ----
 # ggplot() + geom_jitter(data = occ.data,
