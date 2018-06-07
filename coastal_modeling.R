@@ -50,46 +50,61 @@ logis_plot(weight)
 log_emig <- split(valid.data, valid.data$year)
 
 ## Logistic regression on a variable vs T/F coastal
-l_e_fit <- function(variable){
+l_e_fit <- function(data, variable){
   form <- as.formula(paste0('c.num ~ ', variable))
-  lapply(log_emig, function(x){
+  lapply(data, function(x){
     glm(form, family = 'binomial', data = x)
   })
 }
 
-age_fit <- l_e_fit('age')
-tl_fit <- l_e_fit('length')
-wt_fit <- l_e_fit('weight')
+age_fit <- l_e_fit(log_emig, 'age')
+tl_fit <- l_e_fit(log_emig, 'length')
+wt_fit <- l_e_fit(log_emig, 'weight')
 
 ## Bootstrapping
 library(boot)
 
 # Funtion to be bootstrapped
-boot_fun <- function(x, indices){
+boot_fun <- function(x, indices, form){
   d <- x[indices,]
-  fit <- glm(c.num ~ age, family = binomial, data = d)
+  fit <- glm(form, family = 'binomial', data = d)
   coeffs <- coef(fit)
   
   # Formula below is reduction of ((log(prop / (1 - prop)) - intercept) / age)
   # where prop = 0.5. Used to calculate age @ 50% coastal. Can be adjusted
   # later if different proportions are desired
-  a50 <- setNames(-coeffs[1] / coeffs[2], 'a50')
-  coeffs <- c(coeffs, a50)
+  pct50 <- setNames(-coeffs[1] / coeffs[2], 'pct50')
+  coeffs <- c(coeffs, pct50)
   
   # Returns GLM coefficients and the length at 50% coastal
   coeffs
 }
 
 # Apply 10k times over each year subset
-l_e_boot <- lapply(log_emig, boot, statistic = boot_fun, R = 10000)
+l_e_boot <- function(data, variable){
+  lapply(data, function(x, var){
+    form <- as.formula(paste0('c.num ~ ', var))
+    boot(data = x, statistic = boot_fun, R = 10000, form = form)
+  },
+  var = variable)
+}
+
+age_boot <- l_e_boot(log_emig, 'age')
+tl_boot <- l_e_boot(log_emig, 'length')
+wt_boot <- l_e_boot(log_emig, 'weight')
 
 # BCa (adjusted bootstrap percentile) 95% CIs
-l_e_bootci <- lapply(l_e_boot, function(x){
-  list(intercept = boot.ci(x, index = 1, type = 'bca'),
-       age = boot.ci(x, index = 2, type = 'bca'),
-       a50 = boot.ci(x, index = 3, type = 'bca'))
-})
+l_e_bootci <- function(boot.fit){
+  lapply(boot.fit, function(x){
+    list(pct50 = boot.ci(x, index = 3, type = 'bca'),
+         intercept = boot.ci(x, index = 1, type = 'bca'),
+         age = boot.ci(x, index = 2, type = 'bca'))
+  })
+}
 
+age_bootci <- l_e_bootci(age_boot)
+tl_bootci <- l_e_bootci(tl_boot)
+wt_bootci <- l_e_bootci(wt_boot)
 
 # occ.data <- secor.sb %>% 
 #   left_join(valid.fish) %>% 
