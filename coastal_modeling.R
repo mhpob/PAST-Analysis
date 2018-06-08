@@ -41,9 +41,9 @@ logis_plot <- function(variable){
     theme_bw()
 }
 
-logis_plot(age)
-logis_plot(length)
-logis_plot(weight)
+# logis_plot(age)
+# logis_plot(length)
+# logis_plot(weight)
 
 
 ### Per-year model fitting and bootstrapping ----
@@ -52,9 +52,11 @@ log_emig <- split(valid.data, valid.data$year)
 ## Logistic regression on a variable vs T/F coastal
 l_e_fit <- function(data, variable){
   form <- as.formula(paste0('c.num ~ ', variable))
+  
   lapply(data, function(x){
     glm(form, family = 'binomial', data = x)
   })
+  
 }
 
 age_fit <- l_e_fit(log_emig, 'age')
@@ -80,13 +82,15 @@ boot_fun <- function(x, indices, form){
   coeffs
 }
 
-# Apply 10k times over each year subset
+# Apply 10k times over each year subset.
 l_e_boot <- function(data, variable){
-  lapply(data, function(x, var){
-    form <- as.formula(paste0('c.num ~ ', var))
-    boot(data = x, statistic = boot_fun, R = 10000, form = form)
-  },
-  var = variable)
+  form <- as.formula(paste0('c.num ~ ', variable))
+  ncore <- as.integer(Sys.getenv('NUMBER_OF_PROCESSORS')) - 2
+  
+  lapply(data, function(x){
+    boot(data = x, statistic = boot_fun, R = 10000, form = form,
+         parallel = 'snow', ncpus = ncore)
+  })
 }
 
 age_boot <- l_e_boot(log_emig, 'age')
@@ -96,15 +100,20 @@ wt_boot <- l_e_boot(log_emig, 'weight')
 # BCa (adjusted bootstrap percentile) 95% CIs
 l_e_bootci <- function(boot.fit){
   lapply(boot.fit, function(x){
-    list(pct50 = boot.ci(x, index = 3, type = 'bca'),
-         intercept = boot.ci(x, index = 1, type = 'bca'),
-         age = boot.ci(x, index = 2, type = 'bca'))
+    temp <- list(pct50 = boot.ci(x, index = 3, type = 'bca'),
+                 intercept = boot.ci(x, index = 1, type = 'bca'),
+                 hold = boot.ci(x, index = 2, type = 'bca'))
+    names(temp)[3] <- names(x$t0)[2]
+    temp
   })
 }
 
 age_bootci <- l_e_bootci(age_boot)
 tl_bootci <- l_e_bootci(tl_boot)
 wt_bootci <- l_e_bootci(wt_boot)
+
+# lapply(wt_boot, `[`, 't0')
+# lapply(wt_fit, summary)
 
 # occ.data <- secor.sb %>% 
 #   left_join(valid.fish) %>% 
