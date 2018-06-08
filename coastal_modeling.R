@@ -30,20 +30,21 @@ valid.data <- valid.fish %>%
 
 # Logistic regression plot
 library(ggplot2)
-logis_plot <- function(variable){
-  variable <- enquo(variable)
-  ggplot() + geom_point(data = valid.data, aes(x = !! variable, y = c.num,
-                                               color = as.factor(year))) +
-    stat_smooth(data = valid.data, aes(x = !! variable, y = c.num,
-                                       color = as.factor(year)),
+logis_plot <- function(data, xvar, group = 'year'){
+  xvar <- enquo(xvar)
+  group <- enquo(group)
+  ggplot() + geom_point(data = data, aes(x = !! xvar, y = c.num,
+                                               color = as.factor(!! group))) +
+    stat_smooth(data = data, aes(x = !! xvar, y = c.num,
+                                       color = as.factor(!! group)),
                 method = 'glm', method.args = list(family = 'binomial')) +
-    labs(x = variable, y = 'Proportion Coastal', color = 'Year') +
+    labs(x = xvar, y = 'Proportion Coastal', color = 'Year') +
     theme_bw()
 }
 
-# logis_plot(age)
-# logis_plot(length)
-# logis_plot(weight)
+# logis_plot(valid.data, age)
+# logis_plot(valid.data, length)
+# logis_plot(valid.data, weight)
 
 
 ### Per-year model fitting and bootstrapping ----
@@ -114,6 +115,18 @@ wt_bootci <- l_e_bootci(wt_boot)
 
 # lapply(wt_boot, `[`, 't0')
 # lapply(wt_fit, summary)
+
+# Sex-specific from 2014
+sex_dat <- split(log_emig[['2014']], log_emig[['2014']]$sex)
+ggplot() + geom_point(data = log_emig[['2014']], aes(x = length, y = c.num,
+                                       color = sex)) +
+  stat_smooth(data = log_emig[['2014']], aes(x = length, y = c.num,
+                               color = sex),
+              method = 'glm', method.args = list(family = 'binomial')) +
+  labs(x = "length", y = 'Proportion Coastal', color = 'Year') +
+  theme_bw()
+sex_fit <- l_e_fit(sex_dat, variable = 'age')
+
 
 # occ.data <- secor.sb %>% 
 #   left_join(valid.fish) %>% 
