@@ -17,9 +17,10 @@ valid.fish <- secor.sb %>%
   # weren't heard after July of a year, but were heard in years after
   filter(max.mo >= 8 | max > max.yr)
 
-valid.data <- valid.fish %>%
+valid.data <- ungroup(valid.fish) %>%
   left_join(mutate(secor.sb, year = year(date.local))) %>% 
   mutate(age = age + (year - 2014),
+         year = as.factor(year),
          coastal = case_when(array %in% c('VA Coast', 'MD Coast', 'DE Coast',
                                           'NYB', 'Hudson', 'Long Island', 'Mass',
                                           'New Jersey') ~ T,
@@ -34,9 +35,9 @@ logis_plot <- function(data, xvar, group = year){
   xvar <- enquo(xvar)
   group <- enquo(group)
   ggplot() + geom_point(data = data, aes(x = !! xvar, y = c.num,
-                                               color = as.factor(!! group))) +
+                                               color = !! group)) +
     stat_smooth(data = data, aes(x = !! xvar, y = c.num,
-                                       color = as.factor(!! group)),
+                                       color = !! group),
                 method = 'glm', method.args = list(family = 'binomial')) +
     labs(x = xvar, y = 'Proportion Coastal', color = group) +
     theme_bw()
@@ -116,15 +117,19 @@ wt_bootci <- l_e_bootci(wt_boot)
 # lapply(wt_boot, `[`, 't0')
 # lapply(wt_fit, summary)
 
-# Sex-specific from 2014
-logis_plot(log_emig[['2014']], age, sex)
-logis_plot(log_emig[['2014']], length, sex)
-logis_plot(log_emig[['2014']], weight, sex)
+## Logit model differences significance test
+# Method from http://derekogle.com/fishR/examples/oldFishRVignettes/Maturity.pdf
+model <- glm(c.num ~ age * year, family = 'binomial',
+             data = valid.data, subset = (year %in% c(2014, 2015)))
+drop1(model, ~., test = 'Chisq')
+
+# Method from https://stats.stackexchange.com/questions/316801/how-to-compare-logistic-regression-curves
+modelnoint <- glm(c.num ~ age + year, family = 'binomial',
+                  data = valid.data, subset = (year %in% c(2014, 2015)))
+
+anova(modelnoint, model, test = 'Chisq')
 
 
-sex_dat <- split(log_emig[['2014']], log_emig[['2014']]$sex)
-
-sex_fit <- l_e_fit(sex_dat, variable = 'age')
 
 
 # occ.data <- secor.sb %>% 
