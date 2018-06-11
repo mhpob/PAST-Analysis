@@ -39,15 +39,33 @@ ggplot() + geom_line(data = surv14, aes(x = date, y = pct * 100,
   theme(legend.position = c(0.8, 0.8))
 
 ggplot() + geom_line(data = surv14, aes(x = date, y = log(remaining),
-                                        color = tagging)) +
+                                        color = tagging))
+  # geom_abline(intercept = 24.95, slope =-1.491e-08) +
+  # geom_abline(intercept = 5.752e+01, slope = -3.847e-08) +
   labs(x = 'Date', y = 'Natural log of fish remaining', color = 'Event') +
   scale_x_datetime(date_breaks = '6 month', date_labels = '%b %y') +
   theme_bw() +
   theme(legend.position = c(0.8, 0.8))
 
+# Calculate tag loss
 
+spr.lm <- lm(log(remaining) ~ date, data = surv14,
+             subset = (tagging == 'Spring'))
 
-ggplot() + geom_line(data = surv16, aes(x = date, y = pct * 100)) +
-  labs(x = 'Date', y = 'Percent 2016-tagged detected') +
-  lims(y = c(0, 100)) +
-  theme_bw()
+fall.lm <- lm(log(remaining) ~ date, data = surv14,
+              subset = (tagging == 'Fall' & date <= '2015-12-31'))
+
+ggplot() + geom_line(data = surv14, aes(x = date, y = log(remaining),
+                                        color = tagging)) +
+geom_abline(intercept = coef(spr.lm)[1], slope = coef(spr.lm)[2]) +
+geom_abline(intercept = coef(fall.lm)[1], slope = coef(fall.lm)[2]) +
+labs(x = 'Date', y = 'Natural log of fish remaining', color = 'Event') +
+  scale_x_datetime(date_breaks = '6 month', date_labels = '%b %y') +
+  theme_bw() +
+  theme(legend.position = c(0.8, 0.8))
+
+summary(lm(log(remaining) ~ as.Date(date), data = surv14,
+             subset = (tagging == 'Spring')))
+
+summary(lm(log(remaining) ~ as.Date(date), data = surv14,
+              subset = (tagging == 'Fall' & date <= '2015-12-31')))
