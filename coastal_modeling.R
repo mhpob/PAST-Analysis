@@ -43,7 +43,7 @@ logis_plot <- function(data, xvar, group = year){
     theme_bw()
 }
 
-# logis_plot(valid.data, age)
+logis_plot(valid.data, age)
 # logis_plot(valid.data, length)
 # logis_plot(valid.data, weight)
 
@@ -131,148 +131,65 @@ anova(modelnoint, model, test = 'Chisq')
 
 
 
+# Confidence interval calculation and plotting ----
+## Percentile
+fun <- function(x, coefs){ 1 / (1 + exp(-(coefs[2] * x + coefs[1])))}
 
-# occ.data <- secor.sb %>% 
-#   left_join(valid.fish) %>% 
-#   # Use flag to remove observations if fish didn't make it through year
-#   mutate(yr.flag = ifelse(yr.flag == 2014 & date.local >= '2015-04-01',
-#                           NA, yr.flag)) %>% 
-#   filter(!is.na(yr.flag),
-#          date.local < '2016-04-01') %>% 
-#   mutate(tag.season = ifelse(tag.date == '2014-10-30', 'Fall', 'Spring'),
-#          date.floor = floor_date(date.local, unit = 'month'),
-#          year = ifelse(date.local < '2015-04-01', 2014, 2015),
-#          coastal = ifelse(array %in% c('VA Coast', 'MD Coast', 'DE Coast',
-#                                 'Hudson', 'Long Island', 'Mass', 'New Jersey'),
-#                           1, 0),
-#          age.adjust = ifelse(date.local >= '2015-04-01',
-#                              age + 1, age))
+# Points where to evaluate the model
+x_eval <- seq(6, 13, length.out = 100)
 
-# pct.coastal <- occ.data %>% 
-#   filter(coastal == T) %>% 
-#   distinct(transmitter, date.floor, .keep_all = T) %>%
-#   group_by(transmitter, age.adjust) %>% 
-#   summarize(pct.coastal = n()/12)
-# 
-# occ.data <- left_join(occ.data, pct.coastal) %>% 
-#   group_by(transmitter, year) %>% 
-#   mutate(coastal = ifelse(1 %in% coastal, 1, 0),
-#          pct.coastal = ifelse(is.na(pct.coastal), 0, pct.coastal)) %>%
-#   ungroup() %>% 
-#   distinct(tag.season, transmitter, year, coastal, sex,
-#            pct.coastal, age.adjust, length)
+# Matrix with the predictions
+Pred_mat <- apply(age_boot[['2014']]$t, 1, function(coefs) fun(x_eval, coefs))
 
-# Age/Length v incidence, separated by 2014 tagging event ----
-# ggplot() + geom_jitter(data = occ.data,
-#                       aes(x = age.adjust, y = pct.coastal, color = tag.season),
-#                       width = 0.1, height = 0.01) +
-#   geom_smooth(data = occ.data,
-#               aes(x = age.adjust, y = pct.coastal, color = tag.season)) +
-#   labs(x = 'Age', y = '% of Year in Coastal Waters', color = 'Tag\nSeason') +
-#   coord_cartesian(ylim = c(-0.01, 0.7)) +
-#   scale_x_continuous(breaks = c(3, 6, 9, 12, 15)) +
-#   theme_bw()
-# 
-# ggplot() + geom_jitter(data = occ.data,
-#                       aes(x = length, y = pct.coastal, color = tag.season),
-#                       width = 0.1, height = 0.01) +
-#   geom_smooth(data = occ.data,
-#               aes(x = length, y = pct.coastal, color = tag.season)) +
-#   labs(x = 'Length (mm)', y = '% of Year in Coastal Waters',
-#        color = 'Tag\nSeason') +
-#   coord_cartesian(ylim = c(-0.01, 0.7)) +
-#   theme_bw()
+# Pack the estimates for plotting
+Estims_plot <- cbind(
+  age = x_eval, 
+  as.data.frame(t(apply(Pred_mat, 1, function(y_est) c(
+    median_est = median(y_est), 
+    ci_lower_est = quantile(y_est, probs = 0.025, names = FALSE), 
+    ci_upper_est = quantile(y_est, probs = 0.975, names = FALSE)
+  ))))
+)
 
-# Age/Length v incidence, separated by year ----
-# ggplot() + geom_jitter(data = occ.data,
-#                       aes(x = age.adjust, y = pct.coastal, color = factor(year)),
-#                       width = 0.1, height = 0.01) +
-#   geom_smooth(data = occ.data,
-#               aes(x = age.adjust, y = pct.coastal, color = factor(year))) +
-#   labs(x = 'Age', y = '% of Year in Coastal Waters', color = 'Year') +
-#   coord_cartesian(ylim = c(-0.01, 0.7)) +
-#   scale_x_continuous(breaks = c(3, 6, 9, 12, 15)) +
-#   theme_bw()
-# 
-# ggplot() + geom_jitter(data = occ.data,
-#                       aes(x = length, y = pct.coastal, color = factor(year)),
-#                       width = 0.1, height = 0.01) +
-#   geom_smooth(data = occ.data,
-#               aes(x = length, y = pct.coastal, color = factor(year))) +
-#   labs(x = 'Length (mm)', y = '% of Year in Coastal Waters',
-#        color = 'Year') +
-#   coord_cartesian(ylim = c(-0.01, 0.7)) +
-#   theme_bw()
+ggplot() + geom_point(data = filter(valid.data, year == 2017), aes(x = age, y = c.num))+
+  geom_ribbon(data = Estims_plot, aes(x = age, ymin  = ci_lower_est, 
+                                      ymax = ci_upper_est, alpha = 0.7)) +
+  stat_smooth(data = filter(valid.data, year == 2017), aes(x = age, y = c.num),
+              method = 'glm', method.args = list(family = 'binomial'), se = F)
 
-# Sex v coastal incidence ----
-# ggplot() + geom_jitter(data = filter(occ.data, sex != ''),
-#                        aes(x = age.adjust, y = pct.coastal, color = sex),
-#                        width = 0.1, height = 0.01) +
-#   geom_smooth(data = filter(occ.data, sex != ''),
-#               aes(x = age.adjust, y = pct.coastal, color = sex)) +
-#   labs(x = 'Age', y = '% of Year in Coastal Waters', color = 'Sex') +
-#   coord_cartesian(ylim = c(-0.01, 0.74)) +
-#   scale_x_continuous(breaks = c(3, 6, 9, 12, 15)) +
-#   theme_bw()
-# 
-# ggplot() + geom_jitter(data = filter(occ.data, sex != ''),
-#                        aes(x = length, y = pct.coastal, color = sex),
-#                        width = 0.1, height = 0.01) +
-#   geom_smooth(data = filter(occ.data, sex != ''),
-#               aes(x = length, y = pct.coastal, color = sex)) +
-#   labs(x = 'Length (mm)', y = '% of Year in Coastal Waters',
-#        color = 'Sex') +
-#   coord_cartesian(ylim = c(-0.01, 0.73)) +
-#   theme_bw()
+## From bootstrapping
+b_fun <- function(x, indices){
+  d <- x[indices,]
+  fit <- glm(c.num ~ age, family = 'binomial', data = d)
+  coeffs <- coef(fit)
+  
+  # Formula below is reduction of ((log(prop / (1 - prop)) - intercept) / age)
+  # where prop = 0.5. Used to calculate age @ 50% coastal. Can be adjusted
+  # later if different proportions are desired
+  pct50 <- setNames(-coeffs[1] / coeffs[2], 'pct50')
+  coeffs <- c(coeffs, pct50)
+  
+  p <- range(x$age)
+  p_seq <- seq(p[1], p[2], length.out = 100)
+  hold <- predict(fit, data.frame(age = p_seq), type = 'response')
+  names(hold) <- p_seq
+  
+  # Returns GLM coefficients, length at 50% coastal, and predicted values
+  k <- c(coeffs, hold)
+  k
+}
 
-# Modeling ----
-#   Run coastal ~ age + random(fish) for age
-#   Run years separately for length, shouldn't need random transmitter effect
-rm(pct.coastal, secor.sb, valid.fish)
-spring <- filter(occ.data, tag.season == 'Spring')
-sp.2014 <- filter(spring, year == 2014)
-sp.2015 <- filter(spring, year == 2015)
+# Bootstrap
+l <- boot(data = log_emig[[1]], statistic = b_fun, R = 10000)
 
-# Coastal incidence v age modeling ----
-library(lme4)
-glm_incidence <- glmer(coastal ~ age.adjust + (1 | transmitter),
-                       family = 'binomial',
-                       data = spring)
+# Use boot.ci on predictions
+m <- sapply(4:103,  function(x){
+  hold <- boot.ci(l, index = x, type = 'perc')
+  hold$perc[4:5]})
 
-# Likelihood glmm
-# library(ez)
-# glm_incidence_ML <- ezMixed(data = spring,
-#                            dv = .(coastal),
-#                            fixed = .(age.adjust),
-#                            random = .(transmitter),
-#                            family = 'binomial')
-
-# Coastal incidence v length modeling ----
-glm_incidence14 <- glm(coastal ~ length,
-                       data = sp.2014,
-                       family = 'binomial')
-glm_incidence15 <- glm(coastal ~ length,
-                       data = sp.2015,
-                       family = 'binomial')
-
-# % Months coastal v age ----
-library(lme4)
-glm_PctCoast <- glmer(pct.coastal ~ age.adjust + (1 | transmitter),
-                      family = 'binomial',
-                      data = spring)
-
-# Likelihood glmm
-# library(ez)
-# glm_PctCoast_ML <- ezMixed(data = spring,
-#                            dv = .(pct.coastal),
-#                            fixed = .(age.adjust),
-#                            random = .(transmitter),
-#                            family = 'binomial')
-
-# % Months coastal v length modeling ----
-glm_PctCoast14 <- glm(pct.coastal ~ length,
-                       data = sp.2014,
-                       family = 'binomial')
-glm_PctCoast15 <- glm(pct.coastal ~ length,
-                       data = sp.2015,
-                       family = 'binomial')
+# Plot predictions
+plot(m[1,] ~ seq(6,13, length.out = 100), ylim = c(0, 1))
+points(m[2,]~ seq(6,13, length.out = 100))
+abline(h = 0.5)
+lines(predict(fit, data.frame(age = seq(6,13, length.out = 100)), type = 'response') ~
+        seq(6,13, length.out = 100))
