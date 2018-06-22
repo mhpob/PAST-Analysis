@@ -39,11 +39,12 @@ logis_plot <- function(data, xvar, group = year){
     stat_smooth(data = data, aes(x = !! xvar, y = c.num,
                                        color = !! group),
                 method = 'glm', method.args = list(family = 'binomial')) +
-    labs(x = xvar, y = 'Proportion Coastal', color = group) +
+    labs(x = stringr::str_to_title(as.character(xvar[[2]])), y = 'Proportion Coastal',
+         color = stringr::str_to_title(as.character(group[[2]]))) +
     theme_bw()
 }
 
-logis_plot(valid.data, age)
+logis_plot(valid.data[valid.data$year != 2017,], age)
 # logis_plot(valid.data, length)
 # logis_plot(valid.data, weight)
 
