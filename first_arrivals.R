@@ -2,13 +2,18 @@ library(ggplot2); library(lubridate); library(dplyr)
 load('secor.sb.rda')
 
 base.data <- secor.sb %>% 
-  mutate(coastal = ifelse(array %in% c('VA Coast', 'MD Coast', 'DE Coast',
-                                       'Hudson', 'Long Island', 'Mass',
-                                       'New Jersey'), T, F),
-         yr.adjust = ifelse(date.local <= '2015-03-21', 2014,
-                            ifelse(date.local > '2015-03-21' &
-                                     date.local <= '2016-03-21', 2015,
-                                   2016)),
+  mutate(coastal = case_when(array %in% c('VA Coast', 'MD Coast', 'DE Coast',
+                                         'NYB', 'Hudson', 'Long Island', 'Mass',
+                                         'New Jersey') ~ T,
+                            T ~ F),
+         yr.adjust = case_when(date.local <= '2015-03-01' ~ 2014,
+                               date.local > '2015-03-01' &
+                                 date.local <= '2016-03-01' ~ 2015,
+                               date.local > '2016-03-01' &
+                                 date.local <= '2017-03-01' ~ 2016,
+                               date.local > '2017-03-01' &
+                                 date.local <= '2018-03-01' ~ 2017,
+                               T ~ 2018),
          wk.num = ifelse(week(date.local) >= 13,
                          week(date.local) - 13,
                          week(date.local) + 40),
