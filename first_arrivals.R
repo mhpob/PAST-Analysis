@@ -14,9 +14,13 @@ base.data <- secor.sb %>%
                                date.local > '2017-03-01' &
                                  date.local <= '2018-03-01' ~ 2017,
                                T ~ 2018),
-         wk.num = ifelse(week(date.local) >= 13,
-                         week(date.local) - 13,
-                         week(date.local) + 40),
+         # week number using March 1 of the adjusted year as the origin
+         wk.num = floor(
+           as.integer(
+             as.Date(date.local) - ymd(paste0(yr.adjust, '-03-01'))
+           )
+           / 7
+         ),
          wk = floor_date(date.local, unit = 'week'))
 
 # First week of coastal incidence ----
@@ -26,10 +30,10 @@ first.coast <- base.data %>%
   summarize(c.firstnum = min(wk.num))
 
 lab.func <- function(x){
-  month(ymd('2014-03-21') %m+% weeks(x), label = T, abbr = T)
+  month(ymd('2014-03-01') %m+% weeks(x), label = T, abbr = T)
 }
 
-ggplot() + geom_histogram(data = first.coast, aes(c.firstnum), bins = 52) +
+ggplot() + geom_histogram(data = first.coast, aes(c.firstnum)) +
   facet_wrap(~ yr.adjust, ncol = 1) +
   scale_x_continuous(labels = lab.func) +
   labs(x = 'Arrival in coastal waters', y = 'Count') +
@@ -57,12 +61,14 @@ pot.return <- base.data %>%
          array %in% c('Upper Potomac', 'Mid Potomac')) %>% 
   mutate(year = year(date.local),
          sex = ifelse(sex == '', 'Unknown', sex)) %>% 
-  group_by(transmitter, year, sex) %>% 
-  summarize(p.firstnum = min(wk.num))
+  group_by(transmitter, year) %>% 
+  summarize(wkfirst_pot = min(wk.num),
+            datefirst_pot = min(date.local))
 
-ggplot() + geom_histogram(data = pot.return, aes(p.firstnum, fill = sex),
-                          bins = 52) +
+ggplot() + geom_histogram(data = pot.return,
+                          aes(as.Date(yday(datefirst_pot), '2014-01-01')), bins = 13) +
   facet_wrap(~ year, ncol = 1) +
-  scale_x_continuous(labels = lab.func) +
-  labs(x = 'Movement above Rt. 301', y = 'Count', fill = 'Sex') +
+  scale_x_date(date_breaks = 'month', date_labels = '%b %d') +
+  labs(x = 'Movement above Rt. 301', y = 'Count') +
   theme_bw()
+# ggsave('above301.png', width = 9, height = 7)
