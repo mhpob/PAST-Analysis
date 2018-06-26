@@ -57,10 +57,21 @@ fall.lm <- lm(log(remaining) ~ date, data = surv14,
 
 ggplot() + geom_line(data = surv14, aes(x = date, y = log(remaining),
                                         color = tagging)) +
-geom_abline(intercept = coef(spr.lm)[1], slope = coef(spr.lm)[2]) +
-geom_abline(intercept = coef(fall.lm)[1], slope = coef(fall.lm)[2]) +
-labs(x = 'Date', y = 'Natural log of fish remaining', color = 'Event') +
+  geom_segment(aes(x = min(surv14[surv14$tagging == 'Spring', 'date']),
+                   xend = max(surv14[surv14$tagging == 'Spring', 'date']),
+                   y = coef(spr.lm)[1] + coef(spr.lm)[2] * as.numeric(
+                     min(surv14[surv14$tagging == 'Spring', 'date'])),
+                   yend = coef(spr.lm)[1] + coef(spr.lm)[2] * as.numeric(
+                     max(surv14[surv14$tagging == 'Spring', 'date'])))) +
+  geom_segment(aes(x = min(surv14[surv14$tagging == 'Fall', 'date']),
+                   xend = as.POSIXct('2016-02-01'),
+                   y = coef(fall.lm)[1] + coef(fall.lm)[2] * as.numeric(
+                     min(surv14[surv14$tagging == 'Fall', 'date'])),
+                   yend = coef(fall.lm)[1] + coef(fall.lm)[2] * as.numeric(
+                     as.POSIXct('2016-02-01')))) +
+  labs(x = 'Date', y = 'Natural log of fish remaining', color = 'Event') +
   scale_x_datetime(date_breaks = '6 month', date_labels = '%b %y') +
+  coord_cartesian(ylim = c(1.6, 4.2)) +
   theme_bw() +
   theme(legend.position = c(0.8, 0.8))
 
