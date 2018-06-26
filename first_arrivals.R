@@ -85,77 +85,55 @@ ggplot(data = pot.return) + geom_histogram(aes(as.Date(yday(datefirst_pot),
 
 # Spawning period ANOVAs----
 ## Mean spawn date ~ year
-# Random transmitter effect isn't significant.
-m1 <- lme4::lmer(yday(datefirst_pot) ~ year + (1 | transmitter), data = pot.return)
-m2 <- lm(yday(datefirst_pot) ~ year, data = pot.return)
-anova(m1, m2)
-              
-# Use regular model.
-model <- aov(m2)
+library(emmeans); library(lmerTest)
+m1 <- lmer(yday(datefirst_pot) ~ year + (1 | transmitter), data = pot.return)
+ranova(m1) # Random transmitter effect isn't significant. Use regular model.
+
+model <- lm(yday(datefirst_pot) ~ year, data = pot.return)
+model <- aov(model)
 summary(model)
 TukeyHSD(model)
 
 
 
 # Mean spawn date ~ sex
-library(lme4); library(emmeans)
-# Year should be random factor
-m1 <- lmer(yday(datefirst_pot) ~ (1 | year), data = pot.return)
-m2 <- lm(yday(datefirst_pot) ~ 1, data = pot.return)
-anova(m1, m2)
-
-# Model test
-model_sex <- lmer(yday(datefirst_pot) ~ sex + (1 | year), data = pot.return)
-model_null <- lmer(yday(datefirst_pot) ~ (1 | year), data = pot.return)
-anova(model_sex, model_null) #No difference
+model_sex <- lmer(yday(datefirst_pot) ~ sex  + (1 | year), data = pot.return)
+ranova(model_sex) # Year should be random factor
+anova(model_sex) #No difference
 
 # Just to show pairwise comparisons
 summary(model_sex)
-emmeans(model_sex, list(pairwise ~ sex), adjust = 'tukey')
+emmeans::emmeans(model_sex, list(pairwise ~ sex), adjust = 'tukey')
 
 
 
 # Mean spawn date ~ size
 model_tl <- lmer(yday(datefirst_pot) ~ length + (1 | year), data = pot.return)
-model_null <- lmer(yday(datefirst_pot) ~ (1 | year), data = pot.return)
-
-anova(model_null, model_tl) # No difference
+ranova(model_tl) # Year should be random factor
+anova(model_tl) # No difference
 
 
 
 # Duration ~ year
-# Random transmitter effect is significant when used with year as predictor
-m1 <- lmer(duration ~ year + (1 | transmitter), REML = F, data = pot.return)
-m2 <- lm(duration ~ year, data = pot.return)
-anova(m1, m2)
-
-
 model_dur <- lmer(duration ~ year + (1 | transmitter), data = pot.return)
-model_null <- lmer(duration ~ (1 | transmitter), data = pot.return)
-anova(model_dur, model_null)
+ranova(m1) # Random transmitter effect is significant
+anova(model_dur)
 
 emmeans(model_dur, list(pairwise ~ year), adjust = 'tukey')
 
 
 
 # Duration ~ sex
-# Random year effect is significant
+model_sex <- lmer(duration ~ sex + (1 | year) + (1|transmitter), data = pot.return)
+ranova(model_sex) # Random year effect is significant, transmitter is not
 model_sex <- lmer(duration ~ sex + (1 | year), data = pot.return)
-model_null <- lm(duration ~ sex, data = pot.return)
-anova(model_sex, model_null)
+anova(model_sex)
 
-model_null <- lmer(duration ~ (1 | year), data = pot.return)
-
-
-anova(model_sex, model_null)
 emmeans(model_sex, list(pairwise ~ sex), adjust = 'tukey')
 
 
 
 # Duration ~ size
-model_tl <- lmer(duration ~ length + (1 | year), data = pot.return)
-model_null <- lmer(duration ~ (1 | year), data = pot.return)
-
-anova(model_null, model_tl)
-
-
+model_tl <- lmer(duration ~ length + (1 | year) + (1 | transmitter), data = pot.return)
+ranova(model_tl)
+anova(model_tl)
