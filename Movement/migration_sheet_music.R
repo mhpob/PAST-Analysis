@@ -2,39 +2,39 @@ library(ggplot2); library(lubridate); library(dplyr)
 load('secor.sb.rda')
 
 secor.sb$system <-
-  ifelse(secor.sb$array %in% c('Long Island', 'New Jersey'), 'NY Bight',
+  ifelse(secor.sb$array %in% c('Long Island', 'New Jersey', 'Hudson'), 'NY Bight',
   ifelse(secor.sb$array %in% c('Upper MD Bay', 'Mid MD Bay', 'Lower MD Bay',
-                  'Other', 'Patuxent', 'Choptank'), 'Maryland',
+                  'Other', 'Patuxent', 'Choptank', 'Nanticoke'), 'Maryland',
   ifelse(secor.sb$array %in% c('Bay Mouth', 'Elizabeth', 'James',
                   'Rappahannock', 'York'), 'Virginia',
   secor.sb$array)))
 
-secor.sb$trans.num <-
-  ifelse(secor.sb$tag.date < ymd('2014-10-29', tz = 'America/New_York') &
-           secor.sb$trans.num == '25465', '25465a',
-  ifelse(secor.sb$tag.date >= ymd('2014-10-29', tz = 'America/New_York') &
-           secor.sb$trans.num == '25465', '25465b',
-         secor.sb$trans.num))
+secor.sb$transmitter <-
+  ifelse(mdy(secor.sb$tag.date) < ymd('2014-10-29', tz = 'America/New_York') &
+           grepl('25465', secor.sb$transmitter), paste0(secor.sb$transmitter, 'a'),
+  ifelse(mdy(secor.sb$tag.date) >= ymd('2014-10-29', tz = 'America/New_York') &
+           grepl('25465', secor.sb$transmitter), paste0(secor.sb$transmitter, 'b'),
+         secor.sb$transmitter))
 
-tag.info <- secor.sb %>% 
-  distinct(trans.num, tag.date) %>% 
-  mutate(tag.date = lubridate::ymd(tag.date, tz = 'America/New_York'),
-         date.floor = lubridate::floor_date(tag.date, unit = 'day'),
-         system = ifelse(tag.date < ymd('2014-10-29', tz = 'America/New_York'),
-                         'Mid Potomac', 'Lower Potomac')) %>% 
-  select(tag.date, date.floor, trans.num, system, length)
-
+# tag.info <- secor.sb %>% 
+#   distinct(transmitter, tag.date, .keep_all = T) %>% 
+#   mutate(tag.date = lubridate::mdy(tag.date, tz = 'America/New_York'),
+#          system = ifelse(tag.date < ymd('2014-10-29', tz = 'America/New_York'),
+#                          'Mid Potomac', 'Lower Potomac')) %>% 
+#   select(tag.date, transmitter, system, `length`)
+# 
 secor.sb <- secor.sb %>%
-  mutate(date.floor = lubridate::floor_date(date.local, unit = 'day')) %>% 
-  distinct(date.floor, trans.num) %>% 
-  select(tag.date, date.floor, trans.num, system, length) %>%
-  rbind(., tag.info) %>% 
-  mutate(tag.round = ifelse(tag.date < ymd('2014-10-29', tz = 'America/New_York'),
-                            'A', 'B')) %>% 
-  arrange(desc(tag.round), length, trans.num)
+  mutate(date.floor = lubridate::floor_date(date.local, unit = 'day')) %>%
+  distinct(date.floor, transmitter, .keep_all = T)
+%>%
+  # select(tag.date, date.floor, transmitter, system, length) %>%
+  # rbind(., tag.info) %>%
+  # mutate(tag.round = ifelse(tag.date < ymd('2014-10-29', tz = 'America/New_York'),
+  #                           'A', 'B')) %>%
+  # arrange(desc(tag.round), length, transmitter)
 
-hold <- data.frame(trans.num = unique(secor.sb$trans.num),
-                   plot.order = seq(1:length(unique(secor.sb$trans.num))))
+hold <- data.frame(transmitter = unique(secor.sb$transmitter),
+                   plot.order = seq(1:length(unique(secor.sb$transmitter))))
 secor.sb <- secor.sb %>% 
   left_join(hold)
 
@@ -52,19 +52,30 @@ cols <- c('Upper Potomac' = pot.cols[1], 'Mid Potomac' = pot.cols[2],
           'Mass' = else.cols[4], 'NY Bight' = else.cols[5],
           'MD Coast' = else.cols[6], 'VA Coast' = else.cols[7])
 
+cols2 <- c('Upper Potomac' = pot.cols[1], 'Mid Potomac' = pot.cols[1],
+          'Lower Potomac' = pot.cols[1], 'Maryland' = 'gray',
+          'Virginia' = 'gray', 'C&D' = 'gray',
+          'Delaware' = 'pink', 'DE Coast' = 'red',
+          'Mass' = 'blue', 'NY Bight' = 'blue',
+          'MD Coast' = 'red', 'VA Coast' = 'red')
+
 labels <- secor.sb %>% 
   distinct(trans.num, length) %>% 
   select(length) %>% 
   data.frame()
 labels <- as.numeric(labels[,1])
 
+secor.sb$yday <- yday(secor.sb$date.floor)
+
 ggplot() + geom_raster(data = secor.sb,
-                       aes(x = date.floor, y = as.factor(plot.order),
+                       aes(x = yday, y = transmitter,
                            fill = system)) +
-  labs(x = 'Date', y = 'Length (mm)', fill = 'System') +
-  xlim(lubridate::ymd('2014-04-12'), lubridate::ymd('2015-07-31')) +
-  scale_fill_manual(values = cols, breaks = c('Upper Potomac', 'Mid Potomac',
+  labs(x = 'Date', y ='', fill = 'System') +
+  # xlim(lubridate::ymd('2014-04-12'), lubridate::ymd('2015-07-31')) +
+  scale_fill_manual(values = cols2, breaks = c('Upper Potomac', 'Mid Potomac',
                     'Lower Potomac', 'Maryland', 'Virginia', 'VA Coast',
                     'MD Coast', 'C&D', 'Delaware', 'DE Coast', 'NY Bight',
                     'Mass')) +
-  scale_y_discrete(labels = labels)
+  facet_wrap(~year(secor.sb$date.floor), ncol = 1, scales = 'free_y')+
+  theme(axis.title.y = element_blank(), axis.text.y = element_blank())
+  # scale_y_discrete(labels = labels)
