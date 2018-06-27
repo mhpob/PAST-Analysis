@@ -2,6 +2,7 @@ library(ggplot2); library(lubridate); library(dplyr)
 load('secor.sb.rda')
 
 base.data <- secor.sb %>% 
+  filter(transmitter %in% paste0('A69-1601-', seq(25434, 25533, 1))) %>% 
   mutate(coastal = case_when(array %in% c('VA Coast', 'MD Coast', 'DE Coast',
                                          'NYB', 'Hudson', 'Long Island', 'Mass',
                                          'New Jersey') ~ T,
@@ -62,34 +63,36 @@ pot.return <- base.data %>%
   mutate(year = as.factor(year(date.local)),
          sex = ifelse(sex == '', 'Unknown', sex)) %>% 
   group_by(transmitter, year, sex, length) %>% 
-  summarize(wkfirst_pot = min(wk.num),
-            datefirst_pot = min(date.local),
-            wklast_pot = max(wk.num),
-            datelast_pot = max(date.local),
-            duration = as.numeric(datelast_pot - datefirst_pot))
+  summarize(wkfirst = min(week(date.local)),
+            datefirst = min(date.local),
+            wklast = max(week(date.local)),
+            datelast = max(date.local),
+            duration = as.numeric(datelast - datefirst))
 
-# bins = 14 if plotting first date only, 15 if first and last
-ggplot(data = pot.return) + geom_histogram(aes(as.Date(yday(datefirst_pot),
-                                                       '2014-01-01')), bins = 15,
-                                           fill = 'green', alpha = 0.7) +
-  geom_histogram(aes(as.Date(yday(datelast_pot),
-                             '2014-01-01')), bins = 15, fill = 'red', alpha = 0.7) +
+# bins = 13 if plotting first date only, 14 if first and last
+ggplot(data = pot.return) +
+  geom_histogram(aes(as.Date(yday(datefirst), '2014-01-01')),
+                 breaks = seq(as.Date('2014-02-26'), as.Date('2014-06-04'), by = 'week'),
+                 fill = 'green', alpha = 0.7) +
+  geom_histogram(aes(as.Date(yday(datelast), '2014-01-01')),
+                 breaks = seq(as.Date('2014-02-26'), as.Date('2014-06-04'), by = 'week'),
+                 fill = 'red', alpha = 0.7) +
   facet_wrap(~ year, ncol = 1) +
   scale_x_date(date_breaks = 'month', date_labels = '%b %d') +
   labs(x = 'Movement above Rt. 301', y = 'Count') +
   theme_bw()
 
-# ggsave('301.png', width = 9, height = 7)
+# ggsave('301entry_exit.png', width = 9, height = 7)
 
 
 
 # Spawning period ANOVAs----
 ## Mean spawn date ~ year
 library(emmeans); library(lmerTest)
-m1 <- lmer(yday(datefirst_pot) ~ year + (1 | transmitter), data = pot.return)
+m1 <- lmer(yday(datefirst) ~ year + (1 | transmitter), data = pot.return)
 ranova(m1) # Random transmitter effect isn't significant. Use regular model.
 
-model <- lm(yday(datefirst_pot) ~ year, data = pot.return)
+model <- lm(yday(datefirst) ~ year, data = pot.return)
 model <- aov(model)
 summary(model)
 TukeyHSD(model)
@@ -97,7 +100,7 @@ TukeyHSD(model)
 
 
 # Mean spawn date ~ sex
-model_sex <- lmer(yday(datefirst_pot) ~ sex  + (1 | year), data = pot.return)
+model_sex <- lmer(yday(datefirst) ~ sex  + (1 | year), data = pot.return)
 ranova(model_sex) # Year should be random factor
 anova(model_sex) #No difference
 
@@ -108,7 +111,7 @@ emmeans::emmeans(model_sex, list(pairwise ~ sex), adjust = 'tukey')
 
 
 # Mean spawn date ~ size
-model_tl <- lmer(yday(datefirst_pot) ~ length + (1 | year), data = pot.return)
+model_tl <- lmer(yday(datefirst) ~ length + (1 | year), data = pot.return)
 ranova(model_tl) # Year should be random factor
 anova(model_tl) # No difference
 
