@@ -119,7 +119,7 @@ anova(model_tl) # No difference
 
 # Duration ~ year
 model_dur <- lmer(duration ~ year + (1 | transmitter), data = pot.return)
-ranova(m1) # Random transmitter effect is significant
+ranova(model_dur) # Random transmitter effect is significant
 anova(model_dur)
 
 emmeans(model_dur, list(pairwise ~ year), adjust = 'tukey')
