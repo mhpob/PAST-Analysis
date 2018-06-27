@@ -3,8 +3,9 @@ library(TelemetryR); library(dplyr)
 
 ## Fish leaving Chesapeake Bay
 bay.escapes <- secor.sb %>%
-  filter(array %in% c('Bay Mouth', 'C&D', 'DE Coast', 'Delaware', 'Long Island',
-                      'Mass', 'MD Coast', 'New Jersey', 'VA Coast'))
+  filter(array %in% c('Bay Mouth', 'C&D', 'DE Coast', 'Delaware', 'Hudson',
+                      'Long Island', 'Mass', 'MD Coast', 'New Jersey', 'NYB',
+                      'VA Coast'))
 bay.escapes <- unique(bay.escapes$transmitter)
 bay.escapes <- secor.sb %>%
   filter(transmitter %in% bay.escapes) %>%
@@ -14,8 +15,14 @@ bay.escapes <- secor.sb %>%
 bay.escapes <- split(bay.escapes, bay.escapes$transmitter)
 
 # Create a character vector with in the order of visted arrays
-escape.tracks <- lapply(bay.escapes, track, dates = 'date.local',
-            ids = 'array')
+library(parallel)
+
+cl <- makeCluster(detectCores() - 1)
+clusterEvalQ(cl, library(TelemetryR))
+escape.tracks <- parLapply(cl, bay.escapes, track, dates = 'date.local',
+                           ids = 'array')
+
+
 paste('Number that left =', length(escape.tracks))
 paste('Number that got to Mass. =', length(grep('Mass', escape.tracks)))
 paste('Number that got to Long Island =',
@@ -36,8 +43,8 @@ pot.residents <- secor.sb %>%
 
 pot.residents <- split(pot.residents, pot.residents$transmitter)
 
-lapply(pot.residents, track, dates = 'date.local',
-            ids = 'array')
+parLapply(cl, pot.residents, track, dates = 'date.local',
+          ids = 'array')
 
 
 ## Fish staying within the Chesapeake Bay
@@ -55,5 +62,7 @@ bay.residents <- secor.sb %>%
 
 bay.residents <- split(bay.residents, bay.residents$trans.num)
 
-lapply(bay.residents, track, dates = 'date.local',
-            ids = 'array')
+parLapply(cl, bay.residents, track, dates = 'date.local',
+          ids = 'array')
+
+stopCluster(cl)
