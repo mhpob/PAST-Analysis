@@ -3,16 +3,17 @@ library(TelemetryR); library(dplyr)
 
 ## Fish leaving Chesapeake Bay
 bay.escapes <- secor.sb %>%
+  # fish that have been detected in coastal waters
   filter(array %in% c('Bay Mouth', 'C&D', 'DE Coast', 'Delaware', 'Hudson',
                       'Long Island', 'Mass', 'MD Coast', 'New Jersey', 'NYB',
-                      'VA Coast'))
-bay.escapes <- unique(bay.escapes$transmitter)
-bay.escapes <- secor.sb %>%
-  filter(transmitter %in% bay.escapes) %>%
+                      'VA Coast')) %>% 
+  distinct(transmitter) %>% 
+  # select detections of those transmitters
+  left_join(secor.sb) %>%
   arrange(date.local) %>%
-  data.frame
-
-bay.escapes <- split(bay.escapes, bay.escapes$transmitter)
+  # split using base R
+  data.frame %>% 
+  split(.$transmitter)
 
 # Create a character vector with in the order of visted arrays
 library(parallel)
@@ -33,34 +34,31 @@ paste('Number that got to Delaware =',
                        grep('De', escape.tracks))))
 
 ## Fish staying in the Potomac River
-pot.escapes <- secor.sb %>%
-  filter(!array %in% c('Lower Potomac', 'Mid Potomac', 'Upper Potomac'))
-pot.escapes <- unique(pot.escapes$transmitter)
 pot.residents <- secor.sb %>%
-  filter(!transmitter %in% pot.escapes) %>%
+  filter(!array %in% c('Lower Potomac', 'Mid Potomac', 'Upper Potomac')) %>% 
+  distinct(transmitter) %>% 
+  # Drop transmitters that have detections outside of the Potomac
+  anti_join(secor.sb, .) %>%
   arrange(date.local) %>%
-  data.frame
-
-pot.residents <- split(pot.residents, pot.residents$transmitter)
+  # Split using base R
+  data.frame %>% 
+  split(.$transmitter)
 
 parLapply(cl, pot.residents, track, dates = 'date.local',
           ids = 'array')
 
 
 ## Fish staying within the Chesapeake Bay
-escapes <- secor.sb %>%
+bay.residents <- secor.sb %>%
   filter(array %in% c('Bay Mouth', 'C&D', 'DE Coast', 'Delaware', 'Long Island',
-                      'Mass', 'MD Coast', 'New Jersey', 'VA Coast'))
-escapes <- unique(escapes$transmitter)
-bay.residents <- secor.sb %>%
-  filter(!transmitter %in% escapes)
-bay.residents <- unique(bay.residents$transmitter)
-bay.residents <- secor.sb %>%
-  filter(transmitter %in% bay.residents) %>%
+                      'Mass', 'MD Coast', 'New Jersey', 'VA Coast')) %>% 
+  distinct(transmitter) %>% 
+  anti_join(secor.sb, .) %>% 
+  distinct(transmitter) %>% 
+  left_join(secor.sb) %>% 
   arrange(date.local) %>%
-  data.frame
-
-bay.residents <- split(bay.residents, bay.residents$trans.num)
+  data.frame %>% 
+  split(.$transmitter)
 
 parLapply(cl, bay.residents, track, dates = 'date.local',
           ids = 'array')
