@@ -3,22 +3,21 @@ load('secor.sb.rda')
 
 dat <- secor.sb %>% 
   filter(!grepl('-53', secor.sb$transmitter)) %>% 
-  mutate(yr.adjust = ifelse(date.local <= '2015-03-21', 2014,
-                            ifelse(date.local > '2015-03-21' &
-                                     date.local <= '2016-03-21', 2015,
-                                   ifelse(date.local > '2016-03-21' &
-                                            date.local <= '2017-03-21', 2016,
-                                          2017))))
+  mutate(yr.adjust = case_when(
+    month(date.local) %in% 1:2 ~ year(date.local) - 1,
+    T ~ year(date.local)
+  ))
+
 ## Coastal Designation per year----
 max.date <- dat %>% 
   group_by(transmitter) %>%
-  summarize(max = max(date.local),
-            max = year(max))
+  summarize(max = max(yr.adjust))
 
 coastal <- dat %>%
-  mutate(coastal = ifelse(array %in% c('VA Coast', 'MD Coast', 'DE Coast',
-                                       'Delaware', 'Hudson', 'Long Island',
-                                       'Mass', 'New Jersey'), T, F)) %>% 
+  mutate(coastal = case_when(array %in% c('VA Coast', 'MD Coast', 'DE Coast',
+                                          'NYB', 'Hudson', 'Long Island', 'Mass',
+                                          'New Jersey') ~ T,
+                             T ~ F)) %>% 
   group_by(transmitter, yr.adjust) %>% 
   filter(T %in% coastal) %>% 
   distinct(transmitter) %>% # years coastal
