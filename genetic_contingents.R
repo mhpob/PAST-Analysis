@@ -36,7 +36,14 @@ occ.data <- secor.sb %>%
 
 library(TelemetryR)
 sb.list <- split(secor.sb, secor.sb$transmitter)
-sb.list <- lapply(sb.list, track, dates = 'date.local', ids = 'array')
+
+library(parallel)
+cl <- makeCluster(detectCores() - 1)
+clusterEvalQ(cl, library(TelemetryR))
+
+sb.list <- parLapply(cl, sb.list, track, dates = 'date.local', ids = 'array')
+
+stopCluster(cl)
 
 for(i in 1:length(sb.list)){
   sb.list[[i]]$transmitter <- names(sb.list)[i]
