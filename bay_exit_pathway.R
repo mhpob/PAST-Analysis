@@ -19,46 +19,52 @@ filter(t2014, date.local < '2015-01-01', grepl('[34]/', tag.date)) %>%
 
 # Number that left bay in 2014
 #   (all)
-filter(t2014, date.local < '2015-01-01',
-       array %in% c('Bay Mouth', 'C&D', 'DE Coast', 'Delaware', 'Hudson',
-                    'Long Island', 'Mass', 'MD Coast', 'New Jersey', 'NYB',
-                    'VA Coast')) %>% 
-  distinct(transmitter) %>% 
-  nrow
+baseAll <- filter(t2014, date.local < '2015-01-01',
+                  array %in% c('C&D', 'DE Coast', 'Delaware', 'Hudson', 'Long Island',
+                               'Mass', 'MD Coast', 'New Jersey', 'NYB', 'VA Coast')) %>% 
+  distinct(transmitter)
+nrow(baseAll)
 
 #   (spring-tagged only)
-filter(t2014, date.local < '2015-01-01', grepl('[34]/', tag.date),
-       array %in% c('Bay Mouth', 'C&D', 'DE Coast', 'Delaware', 'Hudson',
-                    'Long Island', 'Mass', 'MD Coast', 'New Jersey', 'NYB',
-                    'VA Coast')) %>% 
-  distinct(transmitter) %>% 
-  nrow
+baseSpring <- filter(t2014, date.local < '2015-01-01', grepl('[34]/', tag.date),
+                     array %in% c('C&D', 'DE Coast', 'Delaware', 'Hudson', 'Long Island',
+                                  'Mass', 'MD Coast', 'New Jersey', 'NYB', 'VA Coast')) %>% 
+  distinct(transmitter)
+nrow(baseSpring)
 
 
 # Number that left through C&D
 #   (all)
-filter(t2014, date.local < '2014-06-01',
-       array %in% c('C&D', 'Delaware')) %>% 
+baseAll %>% 
+  left_join(t2014) %>% 
+  filter(date.local < '2014-06-01',
+         array %in% c('C&D', 'Delaware')) %>% 
   distinct(transmitter) %>% 
   nrow
 
 #   (spring-tagged only)
-filter(t2014, date.local < '2014-06-01', grepl('[34]/', tag.date),
-       array %in% c('C&D', 'Delaware')) %>% 
+baseSpring %>% 
+  left_join(t2014) %>% 
+  filter(date.local < '2014-06-01', grepl('[34]/', tag.date),
+         array %in% c('C&D', 'Delaware')) %>% 
   distinct(transmitter) %>% 
   nrow
 
 
 # Number that left through Mouth
 #   (all)
-filter(t2014, date.local < '2014-06-01',
-       array %in% c('Bay Mouth', 'VA Coast', 'MD Coast')) %>% 
+baseAll %>% 
+  left_join(t2014) %>% 
+  filter(date.local < '2014-06-01',
+         array %in% c('Bay Mouth', 'VA Coast', 'MD Coast')) %>% 
   distinct(transmitter) %>% 
   nrow
 
 #   (spring-tagged only)
-filter(t2014, date.local < '2014-06-01', grepl('[34]/', tag.date),
-       array %in% c('Bay Mouth', 'VA Coast', 'MD Coast')) %>% 
+baseSpring %>% 
+  left_join(t2014) %>% 
+  filter(date.local < '2014-06-01', grepl('[34]/', tag.date),
+         array %in% c('Bay Mouth', 'VA Coast', 'MD Coast')) %>% 
   distinct(transmitter) %>% 
   nrow
 
@@ -70,24 +76,27 @@ filter(t2014, date.local < '2016-01-01', date.local >= '2015-01-01') %>%
 
 
 # Number that left bay in 2015
-filter(t2014, date.local < '2016-01-01', date.local >= '2015-01-01',
-       array %in% c('Bay Mouth', 'C&D', 'DE Coast', 'Delaware', 'Hudson',
-                    'Long Island', 'Mass', 'MD Coast', 'New Jersey', 'NYB',
-                    'VA Coast')) %>% 
-  distinct(transmitter) %>% 
-  nrow
+base <- filter(t2014, date.local < '2016-01-01', date.local >= '2015-01-01',
+               array %in% c('C&D', 'DE Coast', 'Delaware', 'Hudson', 'Long Island',
+                            'Mass', 'MD Coast', 'New Jersey', 'NYB', 'VA Coast')) %>% 
+  distinct(transmitter)
+nrow(base)
 
 
 # Number that left through C&D
-filter(t2014, date.local < '2015-06-01', date.local >= '2015-01-01',
-       array %in% c('C&D', 'Delaware')) %>% 
+base %>% 
+  left_join(t2014) %>% 
+  filter(date.local < '2015-06-01', date.local >= '2015-01-01',
+         array %in% c('C&D', 'Delaware')) %>% 
   distinct(transmitter) %>% 
   nrow
 
 
 # Number that left through Mouth
-filter(t2014, date.local < '2015-06-01', date.local >= '2015-01-01',
-       array %in% c('Bay Mouth', 'VA Coast', 'MD Coast')) %>% 
+base %>% 
+  left_join(t2014) %>% 
+  filter(date.local < '2015-06-01', date.local >= '2015-01-01',
+         array %in% c('Bay Mouth', 'VA Coast', 'MD Coast')) %>% 
   distinct(transmitter) %>% 
   nrow
 
@@ -99,31 +108,27 @@ filter(t2014, date.local < '2017-01-01', date.local >= '2016-01-01') %>%
 
 
 # Number that left bay in 2016
-filter(t2014, date.local < '2017-01-01', date.local >= '2016-01-01',
-       array %in% c('Bay Mouth', 'C&D', 'DE Coast', 'Delaware', 'Hudson',
-                    'Long Island', 'Mass', 'MD Coast', 'New Jersey', 'NYB',
-                    'VA Coast')) %>% 
-  distinct(transmitter) %>% 
-  nrow
+base <- filter(t2014, date.local < '2017-01-01', date.local >= '2016-01-01',
+       array %in% c('C&D', 'DE Coast', 'Delaware', 'Hudson', 'Long Island',
+                    'Mass', 'MD Coast', 'New Jersey', 'NYB', 'VA Coast')) %>% 
+  distinct(transmitter)
+nrow(base)
 
 
 # Number that left through C&D
-filter(t2014, date.local < '2016-06-01', date.local >= '2016-01-01',
-       array %in% c('C&D', 'Delaware')) %>% 
-  distinct(transmitter) %>% 
-  nrow
-
-
-# Number that left through C&D
-filter(t2014, date.local < '2016-06-01', date.local >= '2016-01-01',
-       array %in% c('C&D', 'Delaware')) %>% 
+base %>% 
+  left_join(t2014) %>% 
+  filter(date.local < '2016-06-01', date.local >= '2016-01-01',
+         array %in% c('C&D', 'Delaware')) %>% 
   distinct(transmitter) %>% 
   nrow
 
 
 # Number that left through Mouth
-filter(t2014, date.local < '2016-06-01', date.local >= '2016-01-01',
-       array %in% c('Bay Mouth', 'VA Coast', 'MD Coast')) %>% 
+base %>% 
+  left_join(t2014) %>% 
+  filter(date.local < '2016-06-01', date.local >= '2016-01-01',
+         array %in% c('Bay Mouth', 'VA Coast', 'MD Coast')) %>% 
   distinct(transmitter) %>% 
   nrow
 
@@ -136,23 +141,26 @@ filter(t2014, date.local < '2018-01-01', date.local >= '2017-01-01') %>%
 
 
 # Number that left bay in 2017
-filter(t2014, date.local < '2018-01-01', date.local >= '2017-01-01',
-       array %in% c('Bay Mouth', 'C&D', 'DE Coast', 'Delaware', 'Hudson',
-                    'Long Island', 'Mass', 'MD Coast', 'New Jersey', 'NYB',
-                    'VA Coast')) %>% 
-  distinct(transmitter) %>% 
-  nrow
+base <- filter(t2014, date.local < '2018-01-01', date.local >= '2017-01-01',
+               array %in% c('C&D', 'DE Coast', 'Delaware', 'Hudson', 'Long Island',
+                            'Mass', 'MD Coast', 'New Jersey', 'NYB', 'VA Coast')) %>% 
+  distinct(transmitter)
+nrow(base)
 
 
 # Number that left through C&D
-filter(t2014, date.local < '2017-06-01', date.local >= '2017-01-01',
-       array %in% c('C&D', 'Delaware')) %>% 
+base %>% 
+  left_join(t2014) %>% 
+  filter(date.local < '2017-06-01', date.local >= '2017-01-01',
+         array %in% c('C&D', 'Delaware')) %>% 
   distinct(transmitter) %>% 
   nrow
 
 
 # Number that left through Mouth
-filter(t2014, date.local < '2017-06-01', date.local >= '2017-01-01',
-       array %in% c('Bay Mouth', 'VA Coast', 'MD Coast')) %>% 
+base %>% 
+  left_join(t2014) %>% 
+  filter(date.local < '2017-06-01', date.local >= '2017-01-01',
+         array %in% c('Bay Mouth', 'VA Coast', 'MD Coast')) %>% 
   distinct(transmitter) %>% 
   nrow
