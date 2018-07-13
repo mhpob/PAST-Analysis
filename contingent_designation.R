@@ -37,7 +37,7 @@ for(i in 3:6){
 coastal <- coastal[, !names(coastal) == '<NA>']
 names(coastal)[3:6] <- paste0('Coastal', names(coastal)[3:6])
 
-# Spawning area
+# Spawning area; read from genetic_contingents.R
 spawn <- read.csv('p:/obrien/biotelemetry/past sb/spawn designations.csv')
 all <- left_join(coastal, spawn)
 
