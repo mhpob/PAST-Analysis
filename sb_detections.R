@@ -1,7 +1,9 @@
 library(TelemetryR); library(lubridate); library(dplyr)
 
 # Import/Munging ----
-detects <- vemsort('p:/obrien/biotelemetry/detections')
+cl <- parallel::makeCluster(parallel::detectCores() - 2)
+detects <- vemsort('p:/obrien/biotelemetry/detections', clust = cl, prog_bar = T)
+parallel::stopCluster(cl)
 
 secor.sb <- detects %>% 
   filter(transmitter %in% paste0('A69-1601-', seq(25434, 25533, 1)) |
