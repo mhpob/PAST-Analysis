@@ -4,12 +4,10 @@ load('secor.sb.rda')
 # Goal is to calculate % success of Navy array in detecting fish that went into
 # coastal waters.
 eff.base <- secor.sb %>% 
-  mutate(yr.adjust = ifelse(date.local <= '2015-03-21', 2014,
-                            ifelse(date.local > '2015-03-21' &
-                                     date.local <= '2016-03-21', 2015,
-                                   2016)),
+  mutate(yr.adjust = ifelse(month(date.local) %in% 1:2, year(date.local) - 1,
+                            year(date.local)),
          coastal = ifelse(array %in% c('VA Coast', 'MD Coast', 'DE Coast',
-                                       'Hudson', 'Long Island', 'Mass',
+                                       'NYB', 'Hudson', 'Long Island', 'Mass',
                                        'New Jersey'), T, F),
          mouth = ifelse(array == 'Bay Mouth', T, F),
          month = month(date.local),
