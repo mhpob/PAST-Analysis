@@ -10,12 +10,13 @@ base_map <- ggplot() +
   geom_polygon(data = midstates, aes(x = long, y = lat, group = group),
                fill  = 'lightgrey', color = 'black') +
   coord_map(xlim = c(-77.5, -69), ylim = c(36.5, 42.95)) +
-  labs(x = 'Longitude', y = 'Latitude')
+  labs(x = NULL, y = NULL)
 
-
-stations <- unique(secor.sb[,c('lat', 'long')])
+secor.sb$year <- lubridate::year(secor.sb$date.local)
+stations <- unique(secor.sb[secor.sb$year != 2018, c('lat', 'long', 'year')])
 base_map + geom_point(data = stations, aes(x = as.numeric(long), y = as.numeric(lat)),
-                 color = 'red', size = 4, shape = 21) 
+                 color = 'red', size = 4, shape = 21) +
+  facet_wrap(~year)
 
 library(dplyr)
 past2014 <- filter(secor.sb, grepl('-25', transmitter))
