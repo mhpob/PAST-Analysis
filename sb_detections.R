@@ -19,7 +19,7 @@ array_greps <- list(
   'Patuxent' = 'cbl|jacks|pax|nott|jug',
   'Choptank' = 'chop',
   'Mid MD Bay' = 'kent|annap|dock|rho|thomas',
-  'Lower MD Bay' = 'cedar|goose',
+  'Lower MD Bay' = 'cedar|goose|tangier',
   'Upper MD Bay' = 'elk|pata',
   'C&D' = '&|back creek',
   'Nanticoke' = 'marsh|nan',
@@ -38,15 +38,15 @@ array_greps <- list(
               |chat|mono|cove|elli| inl|orl|sci|jer|ccc|sandwich|guard|scor|
               |province|cutty|mano|barns',
   'Bay Mouth' = '(^b|ts)\\d|CBB|LC|henry|cc ls|\\dch|^ch$',
-  'VA Coast' = '(^cb|ri)($|\\d)|^nc|^ra$|rao|scl|wea'
+  'VA Coast' = '(^cb|ri)($|\\d| )|^nc|^ra$|rao|scl|wea'
 )
 
 addons <- list(
   'Mid Potomac' = 'Report1',
-  'Upper Potomac' = c('Alexandria', 'Dogue Creek', 'Hains Point',
-                      'Mattawoman', 'National Harbor', 'Piscataway', 'Pomonkey',
-                      'Roosevelt Br.', 'S. Capitol Br.', 'S. Craney Isl.',
-                      'Report2', 'Report8'),
+  'Upper Potomac' = c('Alexandria', 'Dogue Creek', 'Hains Point', 'Mattawoman',
+                      'Mallows Bay' ,'National Harbor', 'Piscataway',
+                      'Pomonkey', 'Roosevelt Br.', 'S. Capitol Br.',
+                      'S. Craney Isl.', 'Report2', 'Report8'),
   'Patuxent' = c('Benedicts Bridge', 'Broomes', 'Magruders',
                  'Pepco', 'SERC Active'),
   'Mid MD Bay' = c('Report3', 'Report7', 'Report9'),
