@@ -22,10 +22,10 @@ array_greps <- list(
   'Lower MD Bay' = 'cedar|goose|tangier',
   'Upper MD Bay' = 'elk|pata',
   'C&D' = '&|back creek',
-  'Nanticoke' = 'marsh|nan',
+  'Nanticoke' = 'marshyhope|nanti',
   'Rappahannock' = 'rapp|sting|cr ',
   'York' = 'vims|^y',
-  'James' = '^nn|(g|^r)\\d|bur| poco|^hi|james|NH(1*)(8|0)',
+  'James' = '^nn|(g|^r)\\d|bur_| poco|^hi|james|NH(1*)(8|0)',
   'MD Coast' = '([vat]|cs)-|inner|outer|middle|[iao][nms]\\d',
   'Delaware' = '# 2|# 3|philly|barge',
   'DE Coast' = '# 1|BOEM|gate',
@@ -35,8 +35,8 @@ array_greps <- list(
   'Long Island' = 'fire|inlet \\d|jones|montauk|rockaway|shinnecock|
               |swg|thames',
   'Mass' = '(ca|cz|bb|bh|^er|ph|vs)\\d|dmf|vine|nera|plum|joppa|nau|
-              |chat|mono|cove|elli| inl|orl|sci|jer|ccc|sandwich|guard|scor|
-              |province|cutty|mano|barns',
+              |chat|mono|cove|elli| inl|orl|sci|jer|ccc|sandwich|guard|ledge|
+              |province|cutty|mano|barns|marshfield',
   'Bay Mouth' = '(^b|ts)\\d|CBB|LC|henry|cc ls|\\dch|^ch$',
   'VA Coast' = '(^cb|ri)($|\\d| )|^nc|^ra$|rao|scl|wea'
 )
