@@ -20,11 +20,14 @@ secor.sb <- secor.sb %>%
                                    'New Jersey', 'New York Harbor', 'Long Island',
                                    'Mass'), ordered = T))
 
+reduced_pts <- distinct(secor.sb, transmitter, doy, array, .keep_all = T)
+
 library(ggplot2)
 
-ggplot() + geom_point(data = secor.sb, aes(x = doy, y = array, color = size.bin)) +
+ggplot() + geom_point(data = reduced_pts,
+                      aes(x = doy, y = array, color = size.bin)) +
   facet_wrap(~ year) +
-  labs(x = 'Day of Year', y = NULL) +
+  labs(x = 'Day of Year', y = NULL, color = "Tag Length") +
   theme_bw()
 
 
