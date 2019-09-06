@@ -1,0 +1,95 @@
+---
+title: "Spawning Designation"
+output: html_notebook
+---
+
+Attempting to classify striped bass according to location during presumed spawning. Rules are:
+
+* **Potomac** if
+    + Detected between Mar 15 and May 15 *and*
+    + Above Rt 301 ("Upper Potomac" array)
+*  **Delaware** if
+    + Detected between Mar 15 and May 15 *and*
+    + Above RKM 50 of Delaware river
+        * Smyrna latitude is 39? 18' 21.37"N so using sites N of this location
+*  **Hudson** if
+    + Detected between Apr 15 and Jun 15 *and*
+    + Above RKM 60 of Hudson River
+        * Tappan Zee Br latitude is 41? 4' 11.73"N, so using sites N of this location
+*  **Skipped spawning** if alive, but not located in one of these arrays
+
+# Find which sites fit the rule
+## Dates
+First, we need to label the period that the fish was alive. Here, determined as the time between the first and the most-recent detection.
+```{r, message = F, warning = F}
+load('p:/obrien/biotelemetry/past sb/past-analysis/secor.sb.rda')
+library(dplyr)
+secor.sb <- secor.sb %>% 
+  group_by(transmitter) %>% 
+  summarize(dmin = min(date.local),
+            dmax = max(date.local)) %>% 
+  left_join(secor.sb)
+```
+
+
+Next, need to categorize the dates. To be year agnostic, it's easiest to use the day of year for each date as a filter. I'll just ignore leap years for this.
+```{r, message = F, warning = F}
+library(lubridate)
+```
+March 15 (Potomac and Delaware): `lubridate::yday('2014/03/15') = ` `r yday('2014/03/15')`
+
+May 15 (Potomac and Delaware): `r yday('2014/05/15')`
+
+April 15 (Hudson): `r yday('2014/04/15')`
+
+June 15 (Hudson): `r yday('2014/06/15')`
+
+
+## Sites
+I've pre-coded most of the sites into arrays. Potomac is already listed as "Upper Potomac", but I need to find the sites that pass the rule in DE and Hudson.
+
+```{r}
+dets <- secor.sb %>% 
+  filter(grepl('-25', transmitter)) %>% 
+  mutate(doy = lubridate::yday(date.local),
+         year = lubridate::year(date.local))
+hud <- dets %>% 
+  filter(array == 'Hudson',
+         lat >= 41.069925,
+         doy >= 105,
+         doy <= 166)
+del <- dets %>% 
+  filter(array == 'Delaware',
+         lat >= 39.30594,
+         doy >= 74,
+         doy <= 135)
+pot <- dets %>% 
+  filter(array == 'Upper Potomac',
+         doy >= 74,
+         doy <= 135)
+
+dets <- pot %>% 
+  rbind(hud) %>% 
+  rbind(del)
+```
+To judge skipped spawning, we need to make sure that all years are accounted for in the data set.
+```{r}
+dets <- dets %>% 
+  left_join(data.frame(transmitter = rep(paste0('A69-1601-', 25434:25533),
+                                         each = 4),
+                       year = rep(2014:2017, times = 100)))
+```
+
+
+Now we know the "life" of each fish (we can tell if there was skipped spawning), and have filtered down to the dates/sites we're interested in.
+```{r}
+dets %>% 
+  group_by(transmitter, year) %>% 
+  distinct(array)
+```
+
+
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
