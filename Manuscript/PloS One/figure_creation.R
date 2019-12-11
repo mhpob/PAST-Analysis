@@ -1,3 +1,8 @@
+#                    Centimeters	Inches	Pixels at 300 dpi
+# Minimum width          6.68       2.63	  789
+# Maximum width         19.05	       7.5   	2250
+# Height maximum        22.23	      8.75	  2625
+# 
 
 
 ## Figure 1 ----
@@ -14,9 +19,8 @@ base_map_plot <- ggplot() +
 
 
 # Select stations where striped bass were detected
-stations <- read.csv('manuscript/plos one/Diff_Mig_CB_SB.csv')
-stations <- stations %>% 
-  mutate(year = year(date.floor),
+stations <- read.csv('manuscript/plos one/secor_detections.csv') %>% 
+  mutate(year = year(date),
          lat = round(lat, 3),
          long = round(long, 3)) %>% 
   distinct(lat, long, year)
@@ -25,13 +29,13 @@ stations <- stations %>%
 # Plot per-year locations of detections on base map
 all_years <- base_map_plot +
   geom_point(data = stations, aes(x = long, y = lat),
-             color = 'black', size = 1.5) +
+             color = 'black', size = 1) +
   labs(x = NULL, y = NULL) +
   theme(strip.background = element_rect(fill = NA),
         strip.text = element_text(size = 12),
         plot.margin = unit(c(0, 0.05, 0, 0.05), "cm"),
         axis.text.y.right = element_text(angle = -45, vjust = 0),
-        axis.text = element_text(size = 12)) +
+        axis.text = element_text(size = 9)) +
   facet_wrap(~year)
 
 
@@ -54,20 +58,21 @@ cbbt <- data.frame(long = c(-76.12966, -76.08696, -76.00697,-75.98079),
 # Create Chesapeake-only inset
 cb <- ggplot() +
   geom_sf(data = base_map, fill  = 'grey', color = 'lightgray') +
-  coord_sf(xlim = c(-77.5, -75.5), ylim = c(36.6, 39.8), expand = F) +
-  theme_bw() +
-  theme(plot.margin = unit(c(0, 0.05, 0, 0.05), "cm"),
-        axis.text.y.left = element_text(angle = 45, vjust = 0),
-        axis.text = element_text(size = 12)) +
+  coord_sf(xlim = c(-77.5, -75.5), ylim = c(36.54, 39.8), expand = F) +
+  geom_path(data = cbbt, aes(x = long, y = lat), size = 1) +
   geom_point(data = inset_stations, aes(x = long, y = lat),
-             color = ifelse(inset_stations$lab == '', 'black', NA), size = 1.5) +
+             color = ifelse(inset_stations$lab == '', 'black', NA), size = 1) +
   geom_label_repel(data = inset_stations, aes(x = long, y = lat, label = lab),
-                            point.padding = 0.25) +
+                            box.padding = 0.5, point.padding = 0.5, size = 2.75,
+                   xlim = c(NA, -76.6)) +
   geom_point(aes(x = -76.327180, y = 38.052251),
              col = 'black', shape = 4, size = 3) +
   geom_point(aes(x = -76.938432, y = 38.337408),
              col = 'black', shape = 4, size = 3) +
-  geom_path(data = cbbt, aes(x = long, y = lat), size = 1) +
+  theme_bw() +
+  theme(plot.margin = unit(c(0, 0.05, 0, 0.05), "cm"),
+        axis.text.y.left = element_text(angle = 45, vjust = 0),
+        axis.text = element_text(size = 9)) +
   labs(x = NULL, y = NULL)
 
 
@@ -76,7 +81,9 @@ combined <- plot_grid(cb, all_years, rel_widths = c(1, 2.34))
 
 
 # Export figure
-ggsave("manuscript/plos one/Figure1.png", combined, height = 5.74, width = 11.41)
+save_plot("manuscript/plos one/Figure1.tif", combined, device = 'tiff',
+          base_width = 7.5,
+          base_asp = 1.59)
 
 
 # > sessionInfo()
@@ -110,5 +117,43 @@ ggsave("manuscript/plos one/Figure1.png", combined, height = 5.74, width = 11.41
 
 ## Figure 2 ----
 
+library(ggplot2); library(cowplot); library(dplyr)
+
+fish <- read.csv('manuscript/plos one/secor_tagging_data.csv') %>% 
+  mutate(length.cm = length.mm / 10,
+         season = ifelse(grepl('^10', tag.date), 'Fall', 'Spring'),
+         season = factor(season, levels = c('Spring', 'Fall'), ordered = T))
 
 
+tl <- ggplot() + geom_histogram(data = fish,
+                                aes(x = length.cm, fill = season),
+                                breaks = seq(40, 110, 5), color = 'black',
+                                position = 'stack', closed = 'right') +
+  scale_fill_manual(values = c('white', 'darkgray')) +
+  geom_vline(xintercept = c(45, 60, 70, 80), linetype = 'dashed',
+             size = 1) +
+  labs(x = 'Total Length (cm)', y = 'Count') +
+  theme_bw() +
+  theme(legend.position = 'none',
+        axis.text = element_text(size = 15),
+        axis.title = element_text(size = 15))
+
+
+yrs <- ggplot() + geom_histogram(data = fish,
+                                 aes(x = age.yrs, fill = season),
+                                 breaks = seq(3, 14, 1), color = 'black',
+                                 position = 'identity', closed = 'left') +
+  scale_fill_manual(values = c('white', 'darkgray')) +
+  scale_x_continuous(breaks = seq(2, 14, 3)) +
+  labs(x = 'Age (years)', y = NULL) +
+  theme_bw() +
+  theme(legend.position = 'none',
+        axis.text = element_text(size = 15),
+        axis.title = element_text(size = 15))
+
+combined <- plot_grid(tl, yrs)
+
+
+# Export figure
+ggsave("manuscript/plos one/Figure2.tif", combined, device = 'tiff',
+       dpi = 'print', height = 5.74, width = 11.86)
