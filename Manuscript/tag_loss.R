@@ -50,26 +50,26 @@ ggplot() + geom_line(data = surv14, aes(x = date, y = log(remaining),
 # Calculate tag loss
 
 spr.lm <- lm(log(remaining) ~ date, data = surv14,
-             subset = (tagging == 'Spring'))
+             subset = (tagging == 'Spring' & date <= '2017-04-30'))
 
 fall.lm <- lm(log(remaining) ~ date, data = surv14,
               subset = (tagging == 'Fall' & date <= '2015-12-31'))
 
 ggplot() +
   geom_segment(aes(x = min(surv14[surv14$tagging == 'Spring', 'date']),
-                   xend = max(surv14[surv14$tagging == 'Spring', 'date']),
+                   xend = as.POSIXct('2017-04-30'),
                    y = coef(spr.lm)[1] + coef(spr.lm)[2] * as.numeric(
                      min(surv14[surv14$tagging == 'Spring', 'date'])),
                    yend = coef(spr.lm)[1] + coef(spr.lm)[2] * as.numeric(
-                     max(surv14[surv14$tagging == 'Spring', 'date']))),
-               color = 'slategray') +
+                     as.POSIXct('2017-04-30'))),
+               color = 'slategray', size = 1) +
   geom_segment(aes(x = min(surv14[surv14$tagging == 'Fall', 'date']),
                    xend = as.POSIXct('2015-12-31'),
                    y = coef(fall.lm)[1] + coef(fall.lm)[2] * as.numeric(
                      min(surv14[surv14$tagging == 'Fall', 'date'])),
                    yend = coef(fall.lm)[1] + coef(fall.lm)[2] * as.numeric(
                      as.POSIXct('2015-12-31'))),
-               color = 'slategray') +
+               color = 'slategray', size = 1) +
   geom_line(data = surv14, aes(x = date, y = log(remaining),
                                linetype = tagging)) +
   scale_linetype_manual(values = c('dashed', 'twodash')) +
@@ -85,8 +85,34 @@ ggplot() +
 
 # Copied @ 657x475
 
-summary(lm(log(remaining) ~ as.Date(date), data = surv14,
-             subset = (tagging == 'Spring')))
+loss_rate <- function(fitted_model){
+  coefs <- summary(fitted_model)$coefficients
+  
+  cat('Instantaneous loss rate:',
+      formatC(coefs[2,1], format = 'e', digits = 2),
+      '\n')
+  
+  cat('95% CI:',
+      formatC(coefs[2,1] - 1.96 * coefs[2,2],
+              format = 'e', digits = 2),
+      '--',
+      formatC(coefs[2,1] + 1.96 * coefs[2,2],
+              format = 'e', digits = 2),
+      '\n')
+  
+  cat('Annual loss rate:',
+      round(coefs[2,1] * 365, 2),
+      '\n')
+  
+  cat('Percent per year:',
+      round((1 - exp(coefs[2,1] * 365)) * 100, 1))
+}
 
-summary(lm(log(remaining) ~ as.Date(date), data = surv14,
-              subset = (tagging == 'Fall' & date <= '2015-12-31')))
+spr.lm <- lm(log(remaining) ~ as.Date(date), data = surv14,
+             subset = (tagging == 'Spring' & date <= '2017-04-30'))
+
+fall.lm <- lm(log(remaining) ~ as.Date(date), data = surv14,
+              subset = (tagging == 'Fall' & date <= '2015-12-31'))
+
+loss_rate(spr.lm)
+loss_rate(fall.lm)
