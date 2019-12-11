@@ -30,11 +30,13 @@ inset_stations <- unique(secor.sb[secor.sb$year == 2015, c('lat', 'long', 'year'
 inset_stations$lab <- ""
 inset_stations$type <-  
 inset_stations <- rbind(inset_stations,
-                        data.frame(lat = c(37, 38.25, 39),
-                                   long = c(-76, -76.77, -76.25),
+                        data.frame(lat = c(36.98, 38.247, 38.99),
+                                   long = c(-76.11, -76.77, -76.37),
                                    year = c(2015, 2015, 2015),
                                    lab = c('Bay Bridge Tunnel',
                                            'Potomac River', 'Bay Bridge')))
+cbbt <- data.frame(long = c(-76.12966, -76.08696, -76.00697,-75.98079),
+                   lat = c(36.91925, 37.02896, 37.084,37.09157))
 
 
 
@@ -54,9 +56,12 @@ cb <- ggplot() +
              col = 'black', shape = 4, size = 3) +
   geom_point(aes(x = -76.938432, y = 38.337408),
              col = 'black', shape = 4, size = 3) +
+  geom_path(data = cbbt, aes(x = long, y = lat), size = 1) +
   labs(x = NULL, y = NULL)
 
 
+
 combined <- cowplot::plot_grid(cb, all, rel_widths = c(1, 2.34))
+combined
 
 ggsave("test.eps", combined) #855*430
