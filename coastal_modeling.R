@@ -21,6 +21,7 @@ valid.data <- ungroup(valid.fish) %>%
   left_join(mutate(secor.sb, year = year(date.local))) %>% 
   mutate(age = age + (year - 2014),
          year = as.factor(year),
+         length = length / 10,
          coastal = case_when(array %in% c('VA Coast', 'MD Coast', 'DE Coast',
                                           'NYB', 'Hudson', 'Long Island', 'Mass',
                                           'New Jersey') ~ T,
@@ -68,7 +69,7 @@ ggplot(data = valid.data[valid.data$year %in% c(2014, 2015),],
   geom_point(aes(shape = year), size = 3) +
   stat_smooth(method = 'glm', method.args = list(family = 'binomial')) +
   scale_color_grey(end = 0.5) + # gets the same colors as plot for age
-  labs(x = 'Length at Tagging', y = 'Proportion Coastal',
+  labs(x = 'Length at Tagging (cm)', y = 'Proportion Coastal',
        color = 'Year', shape = 'Year') +
   theme_bw() +
   theme(legend.position = c(0.1, 0.8),

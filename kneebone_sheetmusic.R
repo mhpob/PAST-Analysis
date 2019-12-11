@@ -7,8 +7,9 @@ secor.sb <- secor.sb %>%
          grepl('25[45]..', transmitter)) %>% 
   mutate(year = lubridate::year(date.local),
          doy = lubridate::yday(date.local),
-         size.bin = case_when(length < 800 ~ '< 800 mm',
-                              length >= 800 ~ '> 800 mm'),
+         length = length / 10,
+         size.bin = case_when(length < 80 ~ '< 80 cm',
+                              length >= 80 ~ '> 80 cm'),
          array = case_when(grepl('Pot', array) ~ 'Potomac',
                            grepl('Chop|MD Bay|Nan|Pat', array) ~ 'MD Ches.',
                            grepl('Eliz|James|Rapp|York', array) ~ 'VA Ches.',
