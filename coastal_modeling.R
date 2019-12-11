@@ -44,9 +44,39 @@ logis_plot <- function(data, xvar, group = year){
     theme_bw()
 }
 
-logis_plot(valid.data[valid.data$year != 2017,], age)
-# logis_plot(valid.data, length)
+logis_plot(valid.data[valid.data$year %in% c(2014, 2015, 2016),], age)
+logis_plot(valid.data[valid.data$year %in% c(2014, 2015),], length)
 # logis_plot(valid.data, weight)
+
+#Manuscript figures, copied at 675*475
+ggplot(data = valid.data[valid.data$year %in% c(2014, 2015, 2016),],
+       aes(x = age, y = c.num, color = year)) +
+  geom_point(aes(shape = year), size = 3) +
+  stat_smooth(method = 'glm', method.args = list(family = 'binomial')) +
+  scale_color_grey() +
+  labs(x = 'Age', y = 'Proportion Coastal', color = 'Year', shape = 'Year') +
+  theme_bw() +
+  theme(legend.position = c(0.1, 0.8),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 12)) +
+  guides(color=guide_legend(override.aes=list(fill=NA)))
+
+ggplot(data = valid.data[valid.data$year %in% c(2014, 2015),],
+       aes(x = length, y = c.num, color = year)) +
+  geom_point(aes(shape = year), size = 3) +
+  stat_smooth(method = 'glm', method.args = list(family = 'binomial')) +
+  scale_color_grey(end = 0.5) + # gets the same colors as plot for age
+  labs(x = 'Length at Tagging', y = 'Proportion Coastal',
+       color = 'Year', shape = 'Year') +
+  theme_bw() +
+  theme(legend.position = c(0.1, 0.8),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 12)) +
+  guides(color=guide_legend(override.aes=list(fill=NA)))
 
 
 ### Per-year model fitting and bootstrapping ----
