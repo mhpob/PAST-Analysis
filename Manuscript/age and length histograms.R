@@ -22,7 +22,7 @@ tl <- ggplot() + geom_histogram(data = filter(ages, grepl('2014', FishID)),
   scale_fill_manual(values = c('white', 'darkgray')) +
   geom_vline(xintercept = c(450, 600, 700, 800), linetype = 'dashed',
              size = 1) +
-  labs(x = 'TL (mm)', y = 'Count') +
+  labs(x = 'Total Length (mm)', y = 'Count') +
   theme_bw() +
   theme(legend.position = 'none',
         axis.text = element_text(size = 15),
