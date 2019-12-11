@@ -10,13 +10,16 @@ base_map <- ggplot() +
 
 load('secor.sb.rda')
 secor.sb <- secor.sb %>% 
-  filter(grepl('-25', transmitter)) %>% 
+  filter(grepl('-25', transmitter),
+         year <= 2018) %>% 
   mutate(year = lubridate::year(date.local),
          lat = round(lat, 3),
-         long = round(long, 3))
-stations <- unique(secor.sb[secor.sb$year <= 2018, c('lat', 'long', 'year')])
-all <- base_map + geom_point(data = stations, aes(x = long, y = lat),
-                             color = 'black', size = 1.5) +
+         long = round(long, 3)) %>% 
+  distinct('lat', 'long', 'year')
+
+all <- base_map +
+  geom_point(data = stations, aes(x = long, y = lat),
+             color = 'black', size = 1.5) +
   labs(x = NULL, y = NULL) +
   theme(strip.background = element_rect(fill = NA),
         strip.text = element_text(size = 12),
@@ -26,15 +29,15 @@ all <- base_map + geom_point(data = stations, aes(x = long, y = lat),
   facet_wrap(~year)
 
 
-inset_stations <- unique(secor.sb[secor.sb$year == 2015, c('lat', 'long', 'year')])
-inset_stations$lab <- ""
-inset_stations$type <-  
-inset_stations <- rbind(inset_stations,
-                        data.frame(lat = c(36.98, 38.247, 38.99),
-                                   long = c(-76.11, -76.77, -76.37),
-                                   year = c(2015, 2015, 2015),
-                                   lab = c('Bay Bridge Tunnel',
-                                           'Potomac River', 'Bay Bridge')))
+inset_stations <- stations %>% 
+  filter(year < 2017) %>% 
+  distinct(lat, long) %>% 
+  mutate(lab = '') %>% 
+  rbind(data.frame(lat = c(36.98, 38.247, 38.99),
+                   long = c(-76.11, -76.77, -76.37),
+                   lab = c('Bay Bridge Tunnel',
+                           'Potomac River', 'Bay Bridge')))
+
 cbbt <- data.frame(long = c(-76.12966, -76.08696, -76.00697,-75.98079),
                    lat = c(36.91925, 37.02896, 37.084,37.09157))
 
@@ -64,4 +67,4 @@ cb <- ggplot() +
 combined <- cowplot::plot_grid(cb, all, rel_widths = c(1, 2.34))
 combined
 
-ggsave("test.eps", combined) #855*430
+ggsave("test.png", combined, height = 5.74, width = 11.41) #855*430 copy ratio
