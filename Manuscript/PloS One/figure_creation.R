@@ -116,15 +116,16 @@ save_plot("manuscript/plos one/Figure1.tif", combined, device = 'tiff',
 
 
 ## Figure 2 ----
-
 library(ggplot2); library(cowplot); library(dplyr)
 
+# Convert from mm to cm and categorize fish by release season
 fish <- read.csv('manuscript/plos one/secor_tagging_data.csv') %>% 
   mutate(length.cm = length.mm / 10,
          season = ifelse(grepl('^10', tag.date), 'Fall', 'Spring'),
          season = factor(season, levels = c('Spring', 'Fall'), ordered = T))
 
 
+# Histogram of total length
 tl <- ggplot() + geom_histogram(data = fish,
                                 aes(x = length.cm, fill = season),
                                 breaks = seq(40, 110, 5), color = 'black',
@@ -139,6 +140,7 @@ tl <- ggplot() + geom_histogram(data = fish,
         axis.title = element_text(size = 15))
 
 
+# Histogram of age
 yrs <- ggplot() + geom_histogram(data = fish,
                                  aes(x = age.yrs, fill = season),
                                  breaks = seq(3, 14, 1), color = 'black',
@@ -151,9 +153,49 @@ yrs <- ggplot() + geom_histogram(data = fish,
         axis.text = element_text(size = 15),
         axis.title = element_text(size = 15))
 
+
+# Plot histograms side-by-side
 combined <- plot_grid(tl, yrs)
 
 
 # Export figure
-ggsave("manuscript/plos one/Figure2.tif", combined, device = 'tiff',
-       dpi = 'print', height = 5.74, width = 11.86)
+save_plot("manuscript/plos one/Figure2.tif", combined, device = 'tiff',
+          base_width = 7.5,
+          base_asp = 1.59)
+
+
+# > sessionInfo()
+# R version 3.6.1 (2019-07-05)
+# Platform: x86_64-w64-mingw32/x64 (64-bit)
+# Running under: Windows 10 x64 (build 17763)
+# 
+# Matrix products: default
+# 
+# locale:
+# [1] LC_COLLATE=English_United States.1252  LC_CTYPE=English_United States.1252   
+# [3] LC_MONETARY=English_United States.1252 LC_NUMERIC=C                          
+# [5] LC_TIME=English_United States.1252    
+# 
+# attached base packages:
+# [1] stats     graphics  grDevices utils     datasets  methods   base     
+# 
+# other attached packages:
+# [1] dplyr_0.8.3   cowplot_1.0.0 ggplot2_3.2.1
+# 
+# loaded via a namespace (and not attached):
+# [1] Rcpp_1.0.3       withr_2.1.2      assertthat_0.2.1 crayon_1.3.4     grid_3.6.1      
+# [6] R6_2.4.1         lifecycle_0.1.0  gtable_0.3.0     magrittr_1.5     scales_1.1.0    
+# [11] pillar_1.4.2     rlang_0.4.2      farver_2.0.1     lazyeval_0.2.2   rstudioapi_0.10 
+# [16] labeling_0.3     tools_3.6.1      glue_1.3.1       purrr_0.3.3      munsell_0.5.0   
+# [21] compiler_3.6.1   pkgconfig_2.0.3  colorspace_1.4-1 tidyselect_0.2.5 tibble_2.1.3  
+
+
+
+## Figure 3 ----
+
+
+
+
+
+
+
