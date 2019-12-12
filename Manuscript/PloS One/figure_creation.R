@@ -296,4 +296,86 @@ ggsave("manuscript/plos one/Figure3.tif", tag_loss, device = 'tiff',
 
 
 
-# Figure 4 ----
+# Figures 4 and 5 ----
+library(ggplot2); library(lubridate); library(ggplot2); library(dplyr)
+
+detections <- read.csv('manuscript/plos one/secor_detections.csv',
+                       stringsAsFactors = F)
+tagging.data <- read.csv('manuscript/plos one/secor_tagging_data.csv',
+                         stringsAsFactors = F)
+
+# Select fish that either 1) made it into August of that year, or 2) who
+# weren't heard after July of a year, but were heard in years after
+valid.fish <- detections %>% 
+  group_by(transmitter) %>%
+  summarize(max.overall = max(date)) %>% 
+  left_join(tagging.data) %>%
+  right_join(detections) %>%
+  filter(grepl('^[34]', tag.date) |
+           (grepl('^10', tag.date) & date >= 2015)) %>%
+  mutate(year = lubridate::year(date)) %>% 
+  group_by(transmitter, year, max.overall) %>%
+  summarize(max.within.yr = max(date),
+            max.mo.within.yr = month(max.within.yr)) %>%
+  filter(max.mo.within.yr >= 8 | max.overall > max.within.yr) %>% 
+  ungroup()
+
+
+# Select data using the valid fish as a key.
+valid.data <- valid.fish %>%
+  left_join(mutate(detections, year = year(date))) %>% 
+  left_join(tagging.data) %>% 
+  mutate(
+    # Advance the scale ages by 1 after each spawning season
+    age = age.yrs + (year - 2014),
+    year = as.factor(year),
+    length.cm = length.mm / 10,
+    # Dummy-code coastal arrays
+    coastal = case_when(array %in% c('VA Coast', 'MD Coast', 'DE Coast',
+                                     'NYB', 'Hudson', 'Long Island', 'Mass',
+                                     'New Jersey') ~ T,
+                        T ~ F)) %>% 
+  group_by(transmitter, year, age, length.cm) %>% 
+  # Calculate number that were detected in coastal arrays
+  summarize(coastal = T %in% coastal) %>% 
+  mutate(c.num = ifelse(coastal == T, 1, 0))
+
+
+# Figure 4
+length.logis <- ggplot(data = valid.data[valid.data$year %in% c(2014, 2015),],
+                       aes(x = length.cm, y = c.num, color = year)) +
+  geom_point(aes(shape = year), size = 3) +
+  stat_smooth(method = 'glm', method.args = list(family = 'binomial')) +
+  scale_color_grey(end = 0.5) + # gets the same colors as Figure 5
+  labs(x = 'Length at Tagging (cm)', y = 'Proportion Coastal',
+       color = 'Year', shape = 'Year') +
+  theme_bw() +
+  theme(legend.position = c(0.1, 0.8),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 12)) +
+  guides(color = guide_legend(override.aes = list(fill = NA)))
+
+
+# Figure 5
+age.logis <- ggplot(data = valid.data[valid.data$year %in% c(2014, 2015, 2016),],
+                    aes(x = age, y = c.num, color = year)) +
+  geom_point(aes(shape = year), size = 3) +
+  stat_smooth(method = 'glm', method.args = list(family = 'binomial')) +
+  scale_color_grey() +
+  labs(x = 'Age', y = 'Proportion Coastal', color = 'Year', shape = 'Year') +
+  theme_bw() +
+  theme(legend.position = c(0.1, 0.8),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 12)) +
+  guides(color = guide_legend(override.aes = list(fill = NA)))
+
+
+ggsave("manuscript/plos one/Figure4.tif", length.logis, device = 'tiff',
+       width = 7.5, height = 5.28, units = 'in', compression = 'lzw')
+
+ggsave("manuscript/plos one/Figure5.tif", age.logis, device = 'tiff',
+       width = 7.5, height = 5.28, units = 'in', compression = 'lzw')
