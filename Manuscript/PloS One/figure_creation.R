@@ -382,3 +382,59 @@ ggsave("manuscript/plos one/Figure4.tif", length.logis,
 ggsave("manuscript/plos one/Figure5.tif", age.logis,
        width = 7.5, height = 5.28, units = 'in',
        device = 'tiff', compression = 'lzw')
+
+
+
+# Figure 6 ----
+library(ggplot2); library(lubridate); library(dplyr)
+detections <- read.csv('manuscript/plos one/secor_detections.csv',
+                       stringsAsFactors = F)
+tagging.data <- read.csv('manuscript/plos one/secor_tagging_data.csv',
+                         stringsAsFactors = F)
+
+detections <- detections %>% 
+  left_join(tagging.data) %>% 
+  filter(!is.na(array),
+         date < '2019-01-01') %>% 
+  mutate(year = year(date),
+         doy = yday(date),
+         length.cm = length.mm / 10,
+         size.bin = case_when(length.cm < 80 ~ '< 80 cm',
+                              length.cm >= 80 ~ '> 80 cm'),
+         array = case_when(grepl('Pot', array) ~ 'Potomac',
+                           grepl('Chop|MD Bay|Nan|Pat', array) ~ 'MD Ches.',
+                           grepl('Eliz|James|Rapp|York', array) ~ 'VA Ches.',
+                           grepl('C\\&D|Del', array) ~ 'C&D Canal',
+                           grepl('NYB|Hud', array) ~ 'NY Harbor',
+                           array == 'Mass' ~ 'Massachusetts',
+                           T ~ array),
+         array = factor(array,
+                        levels = c('Potomac', 'VA Ches.', 'MD Ches.', 'Bay Mouth',
+                                   'C&D Canal', 'VA Coast', 'MD Coast', 'DE Coast',
+                                   'New Jersey', 'NY Harbor', 'Long Island',
+                                   'Massachusetts'), ordered = T)) %>% 
+  distinct(transmitter, doy, array, .keep_all = T)
+
+
+migration_cycle <- ggplot() +
+  geom_point(data = detections,
+             aes(x = doy, y = array, color = size.bin)) +
+  scale_color_grey(start = 0.8, end = 0.2)+
+  facet_wrap(~ year) +
+  labs(x = 'Day of Year', y = NULL, color = "Length at Tagging") +
+  theme_bw() +
+  theme(legend.position = c(0.9, 0.2),
+        legend.justification = c(1, 0),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 12),
+        strip.background = element_rect(fill = NA),
+        strip.text = element_text(size = 12),
+        axis.text.y.left = element_text(angle = 35),
+        axis.text.y = element_text(size = 10),
+        axis.text.x = element_text(size = 12),
+        axis.title.x = element_text(size = 12)) 
+
+
+ggsave("manuscript/plos one/Figure6.tif", migration_cycle,
+       width = 7.5, height = 4.25, units = 'in',
+       device = 'tiff', compression = 'lzw')
