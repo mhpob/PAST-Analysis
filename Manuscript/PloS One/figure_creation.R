@@ -384,6 +384,36 @@ ggsave("manuscript/plos one/Figure5.tif", age.logis,
        device = 'tiff', compression = 'lzw')
 
 
+# > sessionInfo()
+# R version 3.6.1 (2019-07-05)
+# Platform: x86_64-w64-mingw32/x64 (64-bit)
+# Running under: Windows 10 x64 (build 17763)
+# 
+# Matrix products: default
+# 
+# locale:
+# [1] LC_COLLATE=English_United States.1252 
+# [2] LC_CTYPE=English_United States.1252   
+# [3] LC_MONETARY=English_United States.1252
+# [4] LC_NUMERIC=C                          
+# [5] LC_TIME=English_United States.1252    
+# 
+# attached base packages:
+# [1] stats     graphics  grDevices utils     datasets  methods   base     
+# 
+# other attached packages:
+# [1] dplyr_0.8.3     lubridate_1.7.4 ggplot2_3.2.1  
+# 
+# loaded via a namespace (and not attached):
+# [1] Rcpp_1.0.3       rstudioapi_0.10  magrittr_1.5     tidyselect_0.2.5
+# [5] munsell_0.5.0    colorspace_1.4-1 R6_2.4.1         rlang_0.4.2     
+# [9] stringr_1.4.0    tools_3.6.1      grid_3.6.1       gtable_0.3.0    
+# [13] withr_2.1.2      lazyeval_0.2.2   assertthat_0.2.1 digest_0.6.23   
+# [17] tibble_2.1.3     lifecycle_0.1.0  crayon_1.3.4     purrr_0.3.3     
+# [21] farver_2.0.1     glue_1.3.1       labeling_0.3     stringi_1.4.3   
+# [25] compiler_3.6.1   pillar_1.4.2     scales_1.1.0     pkgconfig_2.0.3
+
+
 
 # Figure 6 ----
 library(ggplot2); library(lubridate); library(dplyr)
@@ -438,3 +468,33 @@ migration_cycle <- ggplot() +
 ggsave("manuscript/plos one/Figure6.tif", migration_cycle,
        width = 7.5, height = 4.25, units = 'in',
        device = 'tiff', compression = 'lzw')
+
+
+# > sessionInfo()
+# R version 3.6.1 (2019-07-05)
+# Platform: x86_64-w64-mingw32/x64 (64-bit)
+# Running under: Windows 10 x64 (build 17763)
+# 
+# Matrix products: default
+# 
+# locale:
+# [1] LC_COLLATE=English_United States.1252 
+# [2] LC_CTYPE=English_United States.1252   
+# [3] LC_MONETARY=English_United States.1252
+# [4] LC_NUMERIC=C                          
+# [5] LC_TIME=English_United States.1252    
+# 
+# attached base packages:
+# [1] stats     graphics  grDevices utils     datasets  methods   base     
+# 
+# other attached packages:
+# [1] dplyr_0.8.3     lubridate_1.7.4 ggplot2_3.2.1  
+# 
+# loaded via a namespace (and not attached):
+# [1] Rcpp_1.0.3       rstudioapi_0.10  magrittr_1.5     tidyselect_0.2.5
+# [5] munsell_0.5.0    colorspace_1.4-1 R6_2.4.1         rlang_0.4.2     
+# [9] stringr_1.4.0    tools_3.6.1      grid_3.6.1       gtable_0.3.0    
+# [13] withr_2.1.2      lazyeval_0.2.2   assertthat_0.2.1 digest_0.6.23   
+# [17] tibble_2.1.3     lifecycle_0.1.0  crayon_1.3.4     purrr_0.3.3     
+# [21] farver_2.0.1     glue_1.3.1       labeling_0.3     stringi_1.4.3   
+# [25] compiler_3.6.1   pillar_1.4.2     scales_1.1.0     pkgconfig_2.0.3
