@@ -192,10 +192,108 @@ save_plot("manuscript/plos one/Figure2.tif", combined, device = 'tiff',
 
 
 ## Figure 3 ----
+library(ggplot2); library(TelemetryR); library(lubridate); library(dplyr)
+
+# TelemetryR is a package written/maintained by M. O'Brien and can be downloaded here:
+# https://github.com/mhpob/TelemetryR
+
+detections <- read.csv('manuscript/plos one/secor_detections.csv',
+                       stringsAsFactors = F) %>% 
+  left_join(read.csv('manuscript/plos one/secor_tagging_data.csv',
+                     stringsAsFactors = F)) %>% 
+  mutate(date = ymd(date),
+         tag.season = ifelse(grepl('^10', tag.date), 'Fall', 'Spring'))
+
+
+# Calculate transmitters remaining by release season using TelemetryR::trans_loss
+spring <- detections %>%
+  filter(tag.season == 'Spring') %>%
+  trans_loss(., dates = 'date', group = 'transmitter',
+             stdate = ymd_hms('2014-04-11 00:00:00'),
+             enddate = ymd_hms('2018-12-31 11:59:59')) %>% 
+  mutate(tag.season = 'Spring',
+         pct = remaining / 72)
+
+
+fall <- detections %>%
+  filter(tag.season == 'Fall') %>%
+  trans_loss(., dates = 'date', group = 'transmitter',
+             stdate = ymd_hms('2014-10-30 00:00:00'),
+             enddate = ymd_hms('2018-12-31 11:59:59')) %>% 
+  mutate(tag.season = 'Fall',
+         pct = remaining / 28)
+
+survivors <- rbind(spring, fall)
+
+
+# Per-release-season linear models on POSIX time for ease of plotting
+# Spring release is modeled only through expected transmitter battery life
+spr.lm <- lm(log(remaining) ~ date, data = survivors,
+             subset = (tag.season == 'Spring' & date <= '2017-04-30'))
+
+# Fall release is modeled only through period of initial mortality
+fall.lm <- lm(log(remaining) ~ date, data = survivors,
+              subset = (tag.season == 'Fall' & date <= '2015-12-31'))
+
+tag_loss <- ggplot() +
+  geom_segment(aes(x = min(survivors[survivors$tag.season == 'Spring', 'date']),
+                   xend = as.POSIXct('2017-04-30'),
+                   y = coef(spr.lm)[1] + coef(spr.lm)[2] * as.numeric(
+                     min(survivors[survivors$tag.season == 'Spring', 'date'])),
+                   yend = coef(spr.lm)[1] + coef(spr.lm)[2] * as.numeric(
+                     as.POSIXct('2017-04-30'))),
+               color = 'slategray', size = 1) +
+  geom_segment(aes(x = min(survivors[survivors$tag.season == 'Fall', 'date']),
+                   xend = as.POSIXct('2015-12-31'),
+                   y = coef(fall.lm)[1] + coef(fall.lm)[2] * as.numeric(
+                     min(survivors[survivors$tag.season == 'Fall', 'date'])),
+                   yend = coef(fall.lm)[1] + coef(fall.lm)[2] * as.numeric(
+                     as.POSIXct('2015-12-31'))),
+               color = 'slategray', size = 1) +
+  geom_line(data = survivors, aes(x = date, y = log(remaining),
+                               linetype = tag.season)) +
+  scale_linetype_manual(values = c('dashed', 'twodash')) +
+  labs(x = NULL, y = 'Natural log of fish remaining', linetype = 'Release') +
+  scale_x_datetime(date_breaks = '6 month', date_labels = '%b %y') +
+  coord_cartesian(ylim = c(0, 4.2)) +
+  theme_bw() +
+  theme(legend.position = c(0.8, 0.8),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 12))
+
+
+ggsave("manuscript/plos one/Figure3.tif", tag_loss, device = 'tiff',
+          width = 7.5, height = 5.42, units = 'in')
+
+
+# > sessionInfo()
+# R version 3.6.1 (2019-07-05)
+# Platform: x86_64-w64-mingw32/x64 (64-bit)
+# Running under: Windows 10 x64 (build 17763)
+# 
+# Matrix products: default
+# 
+# locale:
+# [1] LC_COLLATE=English_United States.1252  LC_CTYPE=English_United States.1252   
+# [3] LC_MONETARY=English_United States.1252 LC_NUMERIC=C                          
+# [5] LC_TIME=English_United States.1252    
+# 
+# attached base packages:
+# [1] stats     graphics  grDevices utils     datasets  methods   base     
+# 
+# other attached packages:
+# [1] dplyr_0.8.3      lubridate_1.7.4  TelemetryR_0.9.4 ggplot2_3.2.1   
+# 
+# loaded via a namespace (and not attached):
+# [1] Rcpp_1.0.3        rstudioapi_0.10   magrittr_1.5      tidyselect_0.2.5  munsell_0.5.0    
+# [6] colorspace_1.4-1  R6_2.4.1          rlang_0.4.2       stringr_1.4.0     tools_3.6.1      
+# [11] grid_3.6.1        data.table_1.12.6 gtable_0.3.0      withr_2.1.2       digest_0.6.23    
+# [16] lazyeval_0.2.2    assertthat_0.2.1  tibble_2.1.3      lifecycle_0.1.0   crayon_1.3.4     
+# [21] farver_2.0.1      purrr_0.3.3       glue_1.3.1        labeling_0.3      stringi_1.4.3    
+# [26] compiler_3.6.1    pillar_1.4.2      scales_1.1.0      pkgconfig_2.0.3  
 
 
 
-
-
-
-
+# Figure 4 ----

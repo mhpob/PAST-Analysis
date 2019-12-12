@@ -2,20 +2,21 @@ library(dplyr)
 load('secor.sb.rda')
 
 secor.sb <- secor.sb %>% 
-  filter(date.local <= '2018-12-31',
-         grepl('-25', transmitter)) %>% 
-  mutate(date.floor = lubridate::floor_date(date.local, 'day'),
+  filter(grepl('-25', transmitter)) %>% 
+  mutate(date = case_when(date.local >= '2019-01-01 00:00:00' ~
+                            # Add dummy date if fish was heard after 2018
+                            lubridate::ymd_hms('2019-01-01 00:00:01', tz = 'America/New_York'),
+                      T ~ date.local), 
+         date = lubridate::floor_date(date, 'day'),
          transmitter = case_when(transmitter == 'A69-1601-25465' &
                                    date.utc <= '2014-06-15' ~ 'A69-1601-25465a',
                                  transmitter == 'A69-1601-25465' &
                                    date.utc > '2014-06-15' ~ 'A69-1601-25465b',
-                                 T ~ transmitter)) 
-  
+                                 T ~ transmitter))
 
- detections <- secor.sb %>% 
-  distinct(transmitter, date.floor, station, .keep_all = T) %>% 
-  select(transmitter, date.floor, lat, long, array) %>% 
-  rename(date = 'date.floor')
+detections <- secor.sb %>% 
+  distinct(transmitter, date, station, .keep_all = T) %>% 
+  select(transmitter, date, lat, long, array)
 
 write.csv(detections, 'manuscript/plos one/secor_detections.csv', row.names = F)
 
