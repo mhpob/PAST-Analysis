@@ -81,9 +81,9 @@ combined <- plot_grid(cb, all_years, rel_widths = c(1, 2.34))
 
 
 # Export figure
-save_plot("manuscript/plos one/Figure1.tif", combined, device = 'tiff',
-          base_width = 7.5,
-          base_asp = 1.59)
+save_plot("manuscript/plos one/Figure1.tif", combined,
+          base_width = 7.5, base_asp = 1.59,
+          device = 'tiff', compression = 'lzw')
 
 
 # > sessionInfo()
@@ -159,9 +159,9 @@ combined <- plot_grid(tl, yrs)
 
 
 # Export figure
-save_plot("manuscript/plos one/Figure2.tif", combined, device = 'tiff',
-          base_width = 7.5,
-          base_asp = 1.59)
+save_plot("manuscript/plos one/Figure2.tif", combined,
+          base_width = 7.5, base_asp = 1.59,
+          device = 'tiff', compression = 'lzw')
 
 
 # > sessionInfo()
@@ -264,8 +264,9 @@ tag_loss <- ggplot() +
         legend.title = element_text(size = 12))
 
 
-ggsave("manuscript/plos one/Figure3.tif", tag_loss, device = 'tiff',
-          width = 7.5, height = 5.42, units = 'in')
+ggsave("manuscript/plos one/Figure3.tif", tag_loss,
+       width = 7.5, height = 5.42, units = 'in',
+       device = 'tiff', compression = 'lzw')
 
 
 # > sessionInfo()
@@ -374,8 +375,10 @@ age.logis <- ggplot(data = valid.data[valid.data$year %in% c(2014, 2015, 2016),]
   guides(color = guide_legend(override.aes = list(fill = NA)))
 
 
-ggsave("manuscript/plos one/Figure4.tif", length.logis, device = 'tiff',
-       width = 7.5, height = 5.28, units = 'in', compression = 'lzw')
+ggsave("manuscript/plos one/Figure4.tif", length.logis,
+       width = 7.5, height = 5.28, units = 'in',
+       device = 'tiff', compression = 'lzw')
 
-ggsave("manuscript/plos one/Figure5.tif", age.logis, device = 'tiff',
-       width = 7.5, height = 5.28, units = 'in', compression = 'lzw')
+ggsave("manuscript/plos one/Figure5.tif", age.logis,
+       width = 7.5, height = 5.28, units = 'in',
+       device = 'tiff', compression = 'lzw')
