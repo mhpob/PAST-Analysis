@@ -1,15 +1,9 @@
-#                    Centimeters	Inches	Pixels at 300 dpi
-# Minimum width          6.68       2.63	  789
-# Maximum width         19.05	       7.5   	2250
-# Height maximum        22.23	      8.75	  2625
-# 
-
 
 ## Figure 1 ----
 library(ggplot2); library(ggrepel); library(cowplot) 
 library(lubridate); library(dplyr); library(sf)
 
-# Import map
+# Import map with geographic range in WGS1984 reference
 base_map <- read_sf('manuscript/plos one/atlcoast.gpkg')
 base_map_plot <- ggplot() +
   geom_sf(data = base_map, fill  = 'grey', color = 'lightgray') +
