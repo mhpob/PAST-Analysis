@@ -28,17 +28,17 @@ array_greps <- list(
   'James' = '^nn|(g|^r)\\d|bur_| poco|^hi|james|NH(1*)(8|0)',
   'MD Coast' = '([vat]|cs)-|inner|outer|middle|[iao][nms]\\d',
   'Delaware' = '# 2... ([DBN]|Ch)|# 3|philly|barge',
-  'DE Coast' = '# 1|BOEM|gate',
+  'DE Coast' = '# 1|BOEM|gate|indian',
   'New Jersey' = 'sandy|barnegat|shark river|egg|garden',
   'Hudson' = '^light|storm|nysta',
-  'NYB' = 'stony',
+  'NYB' = 'stony|nywea|chapel hill',
   'Long Island' = 'fire|inlet \\d|jones|montauk|rockaway|shinnecock|
               |swg|thames',
   'Mass' = '(ca|cz|bb|bh|^er|ph|vs)\\d|dmf|vine|nera|plum|joppa|nau|
-              |chat|mono|cove|elli| inl|orl|sci|well|ccc|sandwich|guard|ledge|
-              |province|cutty|mano|barns|marshfield|hull|marble|dux|pam',
+              |chat|mono|cove|elli|(north|hbr) inl|orl|sci|well|ccc|sandwich|
+              |guard|ledge|province|cutty|mano|barns|marshfield|hull|marble|dux|pam',
   'Bay Mouth' = '(^b|ts)\\d|CBB|LC|henry|cc ls|\\dch|^ch$',
-  'VA Coast' = '(^cb|ri)($|\\d| )|^nc|^ra$|rao|scl|wea'
+  'VA Coast' = '(^cb|ri)($|\\d| )|^nc|^ra$|rao|scl|wea '
 )
 
 addons <- list(
