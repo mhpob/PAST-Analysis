@@ -3,9 +3,9 @@ PAST-Analysis
 
 Analysis of data relating to the Potomac and Atlantic Striped bass Telemetry project.
 
-[D. Secor](mailto:secor@umces.edu) received support for this research by the Atlantic States Marine Fisheries Commission and the the National Oceanic and Atmospheric Administration Chesapeake Bay Office: Grant No. 16-0401.
+Analysis associated with funding provided by the Atlantic States Marine Fisheries Commission and the the National Oceanic and Atmospheric Administration Chesapeake Bay Office: Grant No. 16-0401.
 
-Other project details and detections are available through the [Mid-Atlantic Acoustic Telemetry Observing System](https://matos.asascience.com/project/detail/60).
+Other project details and detections are available through the [Mid-Atlantic Acoustic Telemetry Observing System](https://matos.asascience.com/project/detail/87).
 
 
 ## Associated publications, reports, and data sets:
