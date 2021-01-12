@@ -8,7 +8,7 @@ Analysis of data relating to the Potomac and Atlantic Striped bass Telemetry pro
 Other project details and detections are available through the [Mid-Atlantic Acoustic Telemetry Observing System](https://matos.asascience.com/project/detail/60).
 
 
-Associated publications:
+## Associated publications:
 
 Secor DH, O’Brien MHP, Gahagan BI, Watterson JC, Fox DA (2020). Differential migration in Chesapeake Bay striped bass. PLoS ONE 15(5): e0233103. https://doi.org/10.1371/journal.pone.0233103
 
